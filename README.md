@@ -13,3 +13,5 @@ For Alexa Skill Award 2019
 3. commitの仕方は任せますが、基本的に小タスク単位でcommitする。
 4. タスク完了したらslackで連絡する。
 5. ぼくが確認してMergeします。
+
+Googleドライブにやり方の動画がありますのでわからなければ見てください
