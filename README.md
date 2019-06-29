@@ -3,6 +3,7 @@ For Alexa Skill Award 2019
 
 ## Githubの使い方
 - 1task=1branch
+
 １タスクにつき１ブランチを作成します。ブランチ名はタスクに対応したものにします。英語でも日本語でも可。
 
 以下ではブランチを作ってからの流れを示す。Gitの管理はGithub Desktopが安パイ（自分はgitkrakenつかってます）
