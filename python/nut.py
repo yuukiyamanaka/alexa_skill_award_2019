@@ -1,17 +1,32 @@
 import json
+"120行目付近にTODO　診断アルゴリズム挿入があります．"
+
 "質問の回答をbool型で保存"
 anslist = []
 "セッション（会話）の種類を定数で定義"
 "何もない最初の状態"
-_NOMAL_ = 0
+_NORMAL_ = 0
 "診断モード"
 _DIAGNOSIS_ = 1
 "自由会話モード"
 _FREE_ = 0
 
-"セッションの種類を示すフラグ"
+"ルーチンの種類を示すフラグ"
 "最初はノーマル"
-sessionFlag =_NOMAL_
+sessionFlag =_NORMAL_
+
+'最初の質問'
+welcom_mes = 'こんにちは．診断と言っていただければ，あなたにオススメの食べ物を考えてみます．'
+"診断でバグ，例外が怒った時のメッセージ"
+miss_mes = 'すみません．診断に失敗しました'
+"中断，キャンセルと言われた時のメッセージ"
+bye_mes = "ありがとうございました．お大事に"
+
+"Yes or Noの質問"
+question1 = '風邪っぽいですか'
+question2 = '体の疲れ，筋肉痛やだるさはありますか'
+question3 = '食欲はありますか'
+
 
 "今のルーチンはどんな種類の会話なのか"
 class BaseSpeech:
@@ -69,22 +84,6 @@ class OneSpeech(BaseSpeech):
     def __init__(self, speech_text, session_attributes=None):
         super().__init__(speech_text, True, session_attributes)
 
-class DiagnosisSpeech(BaseSpeech):
-    """発話し、ユーザーの返事を待つ"""
-    
-    def __init__(self, speech_text, session_attributes=None):
-        super().__init__(speech_text, False, session_attributes)
-    
-    def reprompt(self, text):
-        """リプロンプトを追加する"""
-        reprompt = {
-            'outputSpeech': {
-                'type': 'PlainText',
-                'text': text
-        }
-        }
-        self._response['response']['reprompt'] = reprompt
-        return self
 
 class QuestionSpeech(BaseSpeech):
     """発話し、ユーザーの返事を待つ"""
@@ -107,17 +106,26 @@ class QuestionSpeech(BaseSpeech):
 
 def diagnosis():
     """ハローと言っておわり"""
-    #qnumber = qnumber +1
+    global sessionFlag
     if len(anslist) == 0 :
-        return DiagnosisSpeech('あなたの体調を教えてください．風邪っぽいですか？').build()
+        return QuestionSpeech(question1).reprompt('よく聞こえませんでした').build()
     elif len(anslist) == 1 :
-        return DiagnosisSpeech('2回目の質問').build()
+        return QuestionSpeech(question2).reprompt('よく聞こえませんでした').build()
     elif len(anslist) == 2 :
-        return DiagnosisSpeech('3回目の質問').build()
+        return QuestionSpeech(question3).reprompt('よく聞こえませんでした').build()
     elif len(anslist) == 3 :
+        
+        "resultに演算結果を入れてください．今は何を聞いてもカレーと答えます．このコードを書いたときにカレーが食べたかったからです．"
+        result = 'カレー'
+        "TODO******診断アルゴリズム*******"
+        
+        "*********************************"
+        "診断結果配列の初期化"
         anslist.clear()
-        return OneSpeech('診断ができました．カレーがオススメです．').simple_card('遊んでくれてありがとう!').build()
-    return DiagnosisSpeech('例外').build()
+        "セッションの状態を初期の状態に"
+        sessionFlag = _NORMAL_
+        return OneSpeech('診断ができました．'+result +'がオススメです').simple_card('遊んでくれてありがとう!').build()
+    return QuestionSpeech(miss_mes).reprompt('よく聞こえませんでした').build()
 
 
 
@@ -133,7 +141,7 @@ def nocount():
 
 def welcome():
     """ようこそと言って、ユーザーの返事を待つ"""
-    return QuestionSpeech('こんにちは．診断と言っていただければ，あなたにオススメの食べ物を考えてみます．'+ str(sessionFlag)).reprompt('よく聞こえませんでした').build()
+    return QuestionSpeech(welcom_mes).reprompt('よく聞こえませんでした').build()
 
 def repeat():
     """ようこそと言って、ユーザーの返事を待つ"""
@@ -141,7 +149,7 @@ def repeat():
 
 def bye():
     """グッバーイといって終わる"""
-    return OneSpeech('グッバーイ').simple_card('遊んでくれてありがとう!').build()
+    return OneSpeech(bye_mes).simple_card('遊んでくれてありがとう!').build()
 
 def lambda_handler(event, context):
     """最初に呼び出される関数"""
