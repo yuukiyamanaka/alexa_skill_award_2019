@@ -59,22 +59,22 @@ class BaseSpeech:
         # 取り出しやすいよう、インスタンスの属性に
         self.speech_text = speech_text
         self.should_end_session = should_end_session
-    self.session_attributes = session_attributes
+        self.session_attributes = session_attributes
 
-def simple_card(self, title, text=None):
-    """シンプルなカードを追加する"""
+    def simple_card(self, title, text=None):
+        """シンプルなカードを追加する"""
         if text is None:
             text = self.speech_text
-    card = {
-        'type': 'Simple',
-            'title': title,
-            'content': text,
-        }
+        card = {
+            'type': 'Simple',
+                'title': title,
+                'content': text,
+            }
         self._response['response']['card'] = card
         return self
-
-def build(self):
-    """最後にこのメソッドを呼んでください..."""
+    
+    def build(self):
+        """最後にこのメソッドを呼んでください..."""
         return self._response
 
 
@@ -97,7 +97,7 @@ class QuestionSpeech(BaseSpeech):
             'outputSpeech': {
                 'type': 'PlainText',
                 'text': text
-        }
+            }
         }
         self._response['response']['reprompt'] = reprompt
         return self
@@ -175,14 +175,13 @@ def lambda_handler(event, context):
             return diagnosis()
         elif (intent_name == 'YesIntent') and sessionFlag == _DIAGNOSIS_:
             return yescount()
-elif intent_name == 'NoIntent' and sessionFlag == _DIAGNOSIS_:
-    return nocount()
+        elif intent_name == 'NoIntent' and sessionFlag == _DIAGNOSIS_:
+            return nocount()
         # 「ヘルプ」「どうすればいいの」「使い方を教えて」で呼ばれる、組み込みインテント
         elif intent_name == 'AMAZON.HelpIntent':
             return welcome()
-
-    # 「キャンセル」「取り消し」「やっぱりやめる」等で呼び出される。組み込みのインテント
-    elif intent_name == 'AMAZON.CancelIntent' or intent_name == 'AMAZON.StopIntent':
-        return bye()
-
-return repeat()
+        # 「キャンセル」「取り消し」「やっぱりやめる」等で呼び出される。組み込みのインテント
+        elif intent_name == 'AMAZON.CancelIntent' or intent_name == 'AMAZON.StopIntent':
+            return bye()
+    
+    return repeat()
