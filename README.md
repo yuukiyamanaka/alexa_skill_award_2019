@@ -5,7 +5,7 @@ For Alexa Skill Award 2019
 - 1task=1branch
 １タスクにつき１ブランチを作成します。ブランチ名はタスクに対応したものにします。英語でも日本語でも可。
 
-以下ではブランチを作ってからの流れを示す。Gitの管理はGithub Desktopが安パイ（自分はgitkrakenつかってます）
+以下ではブランチを作ってからの流れを示す。GitのGUIでの管理はGithub Desktopが安パイ（自分はgitkrakenつかってます）
 
 0. LocalのMasterブランチはremoteからpullしておく。
 1. Masterからブランチを切る。ブランチ名はタスクに対応したものを。
