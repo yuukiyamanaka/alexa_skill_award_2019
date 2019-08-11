@@ -1,5 +1,5 @@
 .DS_store
 .idea/
-.ask/
+.ask/config copy
 lambda/py/lambda_upload
 .venv/

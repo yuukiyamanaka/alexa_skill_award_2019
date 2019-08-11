@@ -25,3 +25,9 @@ ask init
 ```
 先ほどゲットしたアクセスキーとシークレットキーの入力が必要。
 
+### ASK CLIを使って新しいスキルを
+```
+ask new --url https://github.com/yuukiyamanaka/alexa_skill_award_2019.git
+```
+動くかどうかは不明
+
