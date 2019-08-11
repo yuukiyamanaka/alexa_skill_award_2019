@@ -25,9 +25,8 @@ ask init
 ```
 先ほどゲットしたアクセスキーとシークレットキーの入力が必要。
 
-### ASK CLIを使って新しいスキルを
+### スキルのデプロイ
 ```
-ask new --url https://github.com/yuukiyamanaka/alexa_skill_award_2019.git
+ask deploy
 ```
-動くかどうかは不明
-
+.ask/configファイルが更新されるはず。この更新されたファイルはgit commitしないように。
