@@ -1,17 +1,33 @@
 # alexa_skill_award_2019
-For Alexa Skill Award 2019
+## セットアップ
+開発には[ASK CLI](https://developer.amazon.com/ja/docs/smapi/ask-cli-command-reference.html)を利用します。
+ASK CLIのセットアップの詳細は、[クイックスタート:ASK CLI](https://developer.amazon.com/ja/docs/smapi/quick-start-alexa-skills-kit-command-line-interface.html)を参照してください。
+ASK CLIでは、
+- skillの作成、開発
+- skillのデプロイ
+- skillのテスト
+などがサポートされています。
 
-## Githubの使い方
-- 1task=1branch
-１タスクにつき１ブランチを作成します。ブランチ名はタスクに対応したものにします。英語でも日本語でも可。
+### ASK CLIのインストール
+```
+npm install -g ask-sli
+```
+### ASK CLIを自分のアカウントとひもづける（デプロイ時に必要）
+1. ASK CLIが、AWS Lambdaにデプロイするために、IAMユーザーを新規作成する
+[AWSの資格情報とASK CLIとの関連付け](https://developer.amazon.com/ja/docs/smapi/set-up-credentials-for-an-amazon-web-services-account.html)を参考に作成する。
+最終的にユーザーのアクセスキーとシークレットキーをゲットする（ask init時に使用）
+ちょっとややこしい箇所なのでわからなければ聞いてください
 
-以下ではブランチを作ってからの流れを示す。GitのGUIでの管理はGithub Desktopが安パイ（自分はgitkrakenつかってます）
+2. ASK CLIの初期設定
+以下のコマンドを実行する
+```
+ask init
+```
+先ほどゲットしたアクセスキーとシークレットキーの入力が必要。
 
-0. LocalのMasterブランチはremoteからpullしておく。
-1. Masterからブランチを切る。ブランチ名はタスクに対応したものを。
-2. 切った時点で何かをcommitして、リモートへpublishする。続けてpull requestを作っておく。
-3. commitの仕方は任せますが、基本的に小タスク単位でcommitする。
-4. タスク完了したらslackで連絡する。
-5. ぼくが確認してMergeします。
+### ASK CLIを使って新しいスキルを
+```
+ask new --url https://github.com/yuukiyamanaka/alexa_skill_award_2019.git
+```
+動くかどうかは不明
 
-Googleドライブにやり方の動画がありますのでわからなければ見てください

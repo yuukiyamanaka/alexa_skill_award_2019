@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import json
 "120行目付近にTODO　診断アルゴリズム挿入があります．"
 
@@ -102,8 +104,6 @@ class QuestionSpeech(BaseSpeech):
         self._response['response']['reprompt'] = reprompt
         return self
 
-
-
 def diagnosis():
     """ハローと言っておわり"""
     global sessionFlag
@@ -126,8 +126,6 @@ def diagnosis():
         sessionFlag = _NORMAL_
         return OneSpeech('診断ができました．'+result +'がオススメです').simple_card('遊んでくれてありがとう!').build()
     return QuestionSpeech(miss_mes).reprompt('よく聞こえませんでした').build()
-
-
 
 def yescount():
     "anslistにtrueを追加することではいを回答したことを設定"

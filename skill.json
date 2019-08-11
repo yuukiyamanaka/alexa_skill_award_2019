@@ -1,0 +1,29 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "ja-JP": {
+          "summary": "栄養",
+          "examplePhrases": [
+            "アレクサ、栄養を開いて"
+          ],
+          "name": "healthcare",
+          "description": "栄養スキル"
+        }
+      },
+      "isAvailableWorldwide": true,
+      "testingInstructions": "Sample Testing Instructions.",
+      "category": "KNOWLEDGE_AND_TRIVIA",
+      "distributionCountries": []
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "sourceDir": "lambda/py/lambda_upload",
+          "uri": "ask-custom-healthcare-default"
+        }
+      }
+    },
+    "manifestVersion": "1.0"
+  }
+}

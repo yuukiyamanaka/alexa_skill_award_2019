@@ -1,0 +1,53 @@
+{
+  "interactionModel": {
+      "languageModel": {
+          "invocationName": "栄養",
+          "intents": [
+              {
+                "name": "AMAZON.FallbackIntent",
+                "samples": []
+              },
+              {
+                  "name": "AMAZON.CancelIntent",
+                  "samples": []
+              },
+              {
+                  "name": "AMAZON.HelpIntent",
+                  "samples": []
+              },
+              {
+                  "name": "AMAZON.StopIntent",
+                  "samples": []
+              },
+              {
+                  "name": "AMAZON.NavigateHomeIntent",
+                  "samples": []
+              },
+              {
+                  "name": "HelloWorldIntent",
+                  "slots": [],
+                  "samples": [
+                      "こんにちは",
+                      "こんにちはと言って"
+                  ]
+              },
+              {
+                  "name": "ChoseNutIntent",
+                  "slots": [],
+                  "samples": [
+                      "診断",
+                      "教えて",
+                      "食べよう",
+                      "何食べよう",
+                      "今日のサプリ",
+                      "サプリ",
+                      "えいよう",
+                      "栄養",
+                      "今日の栄養"
+                  ]
+              }
+          ],
+          "types": []
+      }
+  }
+}
