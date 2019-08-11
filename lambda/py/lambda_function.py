@@ -1,207 +1,185 @@
 # -*- coding: utf-8 -*-
 
-# This is a Color Picker Alexa Skill.
-# The skill serves as a simple sample on how to use  
-# session attributes.
+import json
+"120行目付近にTODO　診断アルゴリズム挿入があります．"
 
-import logging
+"質問の回答をbool型で保存"
+anslist = []
+"セッション（会話）の種類を定数で定義"
+"何もない最初の状態"
+_NORMAL_ = 0
+"診断モード"
+_DIAGNOSIS_ = 1
+"自由会話モード"
+_FREE_ = 0
 
-from ask_sdk_core.skill_builder import SkillBuilder
-from ask_sdk_core.utils import is_request_type, is_intent_name
-from ask_sdk_core.handler_input import HandlerInput
-from ask_sdk_model import Response
-from ask_sdk_model.ui import SimpleCard
+"ルーチンの種類を示すフラグ"
+"最初はノーマル"
+sessionFlag =_NORMAL_
 
+'最初の質問'
+welcom_mes = 'こんにちは．診断と言っていただければ，あなたにオススメの食べ物を考えてみます．'
+"診断でバグ，例外が怒った時のメッセージ"
+miss_mes = 'すみません．診断に失敗しました'
+"中断，キャンセルと言われた時のメッセージ"
+bye_mes = "ありがとうございました．お大事に"
 
-skill_name = "My Color Session"
-help_text = ("Please tell me your favorite color. You can say "
-             "my favorite color is red")
-
-color_slot_key = "COLOR"
-color_slot = "Color"
-
-sb = SkillBuilder()
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-
-@sb.request_handler(can_handle_func=is_request_type("LaunchRequest"))
-def launch_request_handler(handler_input):
-    """Handler for Skill Launch."""
-    # type: (HandlerInput) -> Response
-    speech = "Welcome to the Alexa Skills Kit color session sample."
-
-    handler_input.response_builder.speak(
-        speech + " " + help_text).ask(help_text)
-    return handler_input.response_builder.response
+"Yes or Noの質問"
+question1 = '風邪っぽいですか'
+question2 = '体の疲れ，筋肉痛やだるさはありますか'
+question3 = '食欲はありますか'
 
 
-@sb.request_handler(can_handle_func=is_intent_name("AMAZON.HelpIntent"))
-def help_intent_handler(handler_input):
-    """Handler for Help Intent."""
-    # type: (HandlerInput) -> Response
-    handler_input.response_builder.speak(help_text).ask(help_text)
-    return handler_input.response_builder.response
+"今のルーチンはどんな種類の会話なのか"
+class BaseSpeech:
+    """シンプルな、発話するレスポンスのベース"""
+    
+    def __init__(self, speech_text, should_end_session, session_attributes=None):
+        """初期化処理
+            
+            引数:
+            speech_text: Alexaに喋らせたいテキスト
+            should_end_session: このやり取りでスキルを終了させる場合はTrue, 続けるならFalse
+            session_attributes: 引き継ぎたいデータが入った辞書
+            """
+        if session_attributes is None:
+            session_attributes = {}
+        
+        # 最終的に返却するレスポンス内容。これを各メソッドで上書き・修正していく
+        self._response = {
+            'version': '1.0',
+            'sessionAttributes': session_attributes,
+            'response': {
+                'outputSpeech': {
+                    'type': 'PlainText',
+                    'text': speech_text
+                },
+                'shouldEndSession': should_end_session,
+            },
+        }
+        
+        # 取り出しやすいよう、インスタンスの属性に
+        self.speech_text = speech_text
+        self.should_end_session = should_end_session
+        self.session_attributes = session_attributes
+
+    def simple_card(self, title, text=None):
+        """シンプルなカードを追加する"""
+        if text is None:
+            text = self.speech_text
+        card = {
+            'type': 'Simple',
+                'title': title,
+                'content': text,
+            }
+        self._response['response']['card'] = card
+        return self
+    
+    def build(self):
+        """最後にこのメソッドを呼んでください..."""
+        return self._response
 
 
-@sb.request_handler(
-    can_handle_func=lambda handler_input:
-        is_intent_name("AMAZON.CancelIntent")(handler_input) or
-        is_intent_name("AMAZON.StopIntent")(handler_input))
-def cancel_and_stop_intent_handler(handler_input):
-    """Single handler for Cancel and Stop Intent."""
-    # type: (HandlerInput) -> Response
-    speech_text = "Goodbye!"
-
-    return handler_input.response_builder.speak(speech_text).response
+class OneSpeech(BaseSpeech):
+    """1度だけ発話する(ユーザーの返事は待たず、スキル終了)"""
+    
+    def __init__(self, speech_text, session_attributes=None):
+        super().__init__(speech_text, True, session_attributes)
 
 
-@sb.request_handler(can_handle_func=is_request_type("SessionEndedRequest"))
-def session_ended_request_handler(handler_input):
-    """Handler for Session End."""
-    # type: (HandlerInput) -> Response
-    return handler_input.response_builder.response
+class QuestionSpeech(BaseSpeech):
+    """発話し、ユーザーの返事を待つ"""
+    
+    def __init__(self, speech_text, session_attributes=None):
+        super().__init__(speech_text, False, session_attributes)
+    
+    def reprompt(self, text):
+        """リプロンプトを追加する"""
+        reprompt = {
+            'outputSpeech': {
+                'type': 'PlainText',
+                'text': text
+            }
+        }
+        self._response['response']['reprompt'] = reprompt
+        return self
 
+def diagnosis():
+    """ハローと言っておわり"""
+    global sessionFlag
+    if len(anslist) == 0 :
+        return QuestionSpeech(question1).reprompt('よく聞こえませんでした').build()
+    elif len(anslist) == 1 :
+        return QuestionSpeech(question2).reprompt('よく聞こえませんでした').build()
+    elif len(anslist) == 2 :
+        return QuestionSpeech(question3).reprompt('よく聞こえませんでした').build()
+    elif len(anslist) == 3 :
+        
+        "resultに演算結果を入れてください．今は何を聞いてもカレーと答えます．このコードを書いたときにカレーが食べたかったからです．"
+        result = 'カレー'
+        "TODO******診断アルゴリズム*******"
+        
+        "*********************************"
+        "診断結果配列の初期化"
+        anslist.clear()
+        "セッションの状態を初期の状態に"
+        sessionFlag = _NORMAL_
+        return OneSpeech('診断ができました．'+result +'がオススメです').simple_card('遊んでくれてありがとう!').build()
+    return QuestionSpeech(miss_mes).reprompt('よく聞こえませんでした').build()
 
-@sb.request_handler(can_handle_func=is_intent_name("WhatsMyColorIntent"))
-def whats_my_color_handler(handler_input):
-    """Check if a favorite color has already been recorded in
-    session attributes. If yes, provide the color to the user.
-    If not, ask for favorite color.
-    """
-    # type: (HandlerInput) -> Response
-    if color_slot_key in handler_input.attributes_manager.session_attributes:
-        fav_color = handler_input.attributes_manager.session_attributes[
-            color_slot_key]
-        speech = "Your favorite color is {}. Goodbye!!".format(fav_color)
-        handler_input.response_builder.set_should_end_session(True)
-    else:
-        speech = "I don't think I know your favorite color. " + help_text
-        handler_input.response_builder.ask(help_text)
+def yescount():
+    "anslistにtrueを追加することではいを回答したことを設定"
+    anslist.append(True)
+    return diagnosis()
 
-    handler_input.response_builder.speak(speech)
-    return handler_input.response_builder.response
+def nocount():
+    "anslistにfalse を追加することでいいえと回答したことを設定"
+    anslist.append(False)
+    return diagnosis()
 
+def welcome():
+    """ようこそと言って、ユーザーの返事を待つ"""
+    return QuestionSpeech(welcom_mes).reprompt('よく聞こえませんでした').build()
 
-@sb.request_handler(can_handle_func=is_intent_name("MyColorIsIntent"))
-def my_color_handler(handler_input):
-    """Check if color is provided in slot values. If provided, then
-    set your favorite color from slot value into session attributes.
-    If not, then it asks user to provide the color.
-    """
-    # type: (HandlerInput) -> Response
-    slots = handler_input.request_envelope.request.intent.slots
+def repeat():
+    """ようこそと言って、ユーザーの返事を待つ"""
+    return QuestionSpeech('ごめんなさい．もう一度言ってください．').reprompt('よく聞こえませんでした').build()
 
-    if color_slot in slots:
-        fav_color = slots[color_slot].value
-        handler_input.attributes_manager.session_attributes[
-            color_slot_key] = fav_color
-        speech = ("Now I know that your favorite color is {}. "
-                  "You can ask me your favorite color by saying, "
-                  "what's my favorite color ?".format(fav_color))
-        reprompt = ("You can ask me your favorite color by saying, "
-                    "what's my favorite color ?")
-    else:
-        speech = "I'm not sure what your favorite color is, please try again"
-        reprompt = ("I'm not sure what your favorite color is. "
-                    "You can tell me your favorite color by saying, "
-                    "my favorite color is red")
+def bye():
+    """グッバーイといって終わる"""
+    return OneSpeech(bye_mes).simple_card('遊んでくれてありがとう!').build()
 
-    handler_input.response_builder.speak(speech).ask(reprompt)
-    return handler_input.response_builder.response
+def lambda_handler(event, context):
+    """最初に呼び出される関数"""
+    # リクエストの種類を取得
+    request = event['request']
+    request_type = request['type']
+    "グローバル変数のフラグを使うことを宣言"
+    global sessionFlag
+    # LaunchRequestは、特定のインテントを提供することなく、ユーザーがスキルを呼び出すときに送信される...
+    # つまり、「アレクサ、ハローワールドを開いて」のようなメッセージ
+    # 「アレクサ、ハローワールドで挨拶しろ」と言うとこれはインテントを含むので、IntentRequestになる
+    if request_type == 'LaunchRequest':
+        return welcome()
 
-
-@sb.request_handler(can_handle_func=is_intent_name("AMAZON.FallbackIntent"))
-def fallback_handler(handler_input):
-    """AMAZON.FallbackIntent is only available in en-US locale.
-    This handler will not be triggered except in that locale,
-    so it is safe to deploy on any locale.
-    """
-    # type: (HandlerInput) -> Response
-    speech = (
-        "The {} skill can't help you with that.  "
-        "You can tell me your favorite color by saying, "
-        "my favorite color is red").format(skill_name)
-    reprompt = ("You can tell me your favorite color by saying, "
-                "my favorite color is red")
-    handler_input.response_builder.speak(speech).ask(reprompt)
-    return handler_input.response_builder.response
-
-
-def convert_speech_to_text(ssml_speech):
-    """convert ssml speech to text, by removing html tags."""
-    # type: (str) -> str
-    s = SSMLStripper()
-    s.feed(ssml_speech)
-    return s.get_data()
-
-
-@sb.global_response_interceptor()
-def add_card(handler_input, response):
-    """Add a card by translating ssml text to card content."""
-    # type: (HandlerInput, Response) -> None
-    response.card = SimpleCard(
-        title=skill_name,
-        content=convert_speech_to_text(response.output_speech.ssml))
-
-
-@sb.global_response_interceptor()
-def log_response(handler_input, response):
-    """Log response from alexa service."""
-    # type: (HandlerInput, Response) -> None
-    print("Alexa Response: {}\n".format(response))
-
-
-@sb.global_request_interceptor()
-def log_request(handler_input):
-    """Log request to alexa service."""
-    # type: (HandlerInput) -> None
-    print("Alexa Request: {}\n".format(handler_input.request_envelope.request))
-
-
-@sb.exception_handler(can_handle_func=lambda i, e: True)
-def all_exception_handler(handler_input, exception):
-    """Catch all exception handler, log exception and
-    respond with custom message.
-    """
-    # type: (HandlerInput, Exception) -> None
-    print("Encountered following exception: {}".format(exception))
-
-    speech = "Sorry, there was some problem. Please try again!!"
-    handler_input.response_builder.speak(speech).ask(speech)
-
-    return handler_input.response_builder.response
-
-
-######## Convert SSML to Card text ############
-# This is for automatic conversion of ssml to text content on simple card
-# You can create your own simple cards for each response, if this is not
-# what you want to use.
-
-from six import PY2
-try:
-    from HTMLParser import HTMLParser
-except ImportError:
-    from html.parser import HTMLParser
-
-
-class SSMLStripper(HTMLParser):
-    def __init__(self):
-        self.reset()
-        self.full_str_list = []
-        if not PY2:
-            self.strict = False
-            self.convert_charrefs = True
-
-    def handle_data(self, d):
-        self.full_str_list.append(d)
-
-    def get_data(self):
-        return ''.join(self.full_str_list)
-
-################################################
-
-
-# Handler to be provided in lambda console.
-lambda_handler = sb.lambda_handler()
+    # 何らかのインテントだった場合
+    elif request_type == 'IntentRequest':
+        intent_name = request['intent']['name']
+        
+        # 「診断」「聞かせて」等で呼ばれる。サンプル発話に書いた部分
+        if intent_name == 'ChoseNutIntent':
+            
+            sessionFlag = _DIAGNOSIS_
+            return diagnosis()
+        elif (intent_name == 'YesIntent') and sessionFlag == _DIAGNOSIS_:
+            return yescount()
+        elif intent_name == 'NoIntent' and sessionFlag == _DIAGNOSIS_:
+            return nocount()
+        # 「ヘルプ」「どうすればいいの」「使い方を教えて」で呼ばれる、組み込みインテント
+        elif intent_name == 'AMAZON.HelpIntent':
+            return welcome()
+        # 「キャンセル」「取り消し」「やっぱりやめる」等で呼び出される。組み込みのインテント
+        elif intent_name == 'AMAZON.CancelIntent' or intent_name == 'AMAZON.StopIntent':
+            return bye()
+    
+    return repeat()

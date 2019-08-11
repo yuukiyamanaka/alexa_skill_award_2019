@@ -2,13 +2,13 @@
   "manifest": {
     "publishingInformation": {
       "locales": {
-        "en-US": {
-          "summary": "Sample Short Description",
+        "ja-JP": {
+          "summary": "栄養",
           "examplePhrases": [
-            "Alexa open color picker"
+            "アレクサ、栄養を開いて"
           ],
           "name": "healthcare",
-          "description": "Sample Full Description"
+          "description": "栄養スキル"
         }
       },
       "isAvailableWorldwide": true,
