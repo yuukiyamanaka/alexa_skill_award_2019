@@ -25,8 +25,29 @@ ask init
 ```
 先ほどゲットしたアクセスキーとシークレットキーの入力が必要。
 
+3. venvの作成
+レポジトリをcloneしたあと、レポジトリのフォルダーの一つ上の階層に移動。
+```
+./alexa_skill_award_2019/hooks/post_new_hook.sh alexa_skill_award_2019 true
+```
+.venvフォルダが作成されていればok
+
 ### スキルのデプロイ
+skill.jsonが置いてある階層で、
 ```
-ask deploy
+./hooks/pre_deploy_hook.sh alexa_skill_award_2019 true all && ask deploy 
 ```
-.ask/configファイルが更新されるはず。この更新されたファイルはgit commitしないように。
+lambda/py/lamnda_uploadフォルダが作成される。
+また、.ask/configファイルが更新されるが、この更新されたファイルはgit commitしないように。
+
+#### ブラウザ側での確認
+- [Alexa Console](https://developer.amazon.com/alexa/console/ask)
+- [AWS Console](https://us-west-2.console.aws.amazon.com/console/home)
+AWS lambdaはオレゴン（us-west-2）でホストされている。Alaxa SkillとLambda Funcが作成されていることがわかる。
+
+#### テスト
+deployされた環境にCLIからアクセスしてテストすることができる。ローカルで実行されるわけではないので注意。
+エラー情報などはCloudWatchでチェックできる。
+```
+ask dialog -l ja-JP
+```
