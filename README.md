@@ -35,7 +35,7 @@ ask init
 ### スキルのデプロイ
 skill.jsonが置いてある階層で、
 ```
-./hooks/pre_deploy_hook.sh alexa_skill_award_2019 true all && ask deploy 
+cp .ask/config_templete .ask/config && ./hooks/pre_deploy_hook.sh alexa_skill_award_2019 true all && ask deploy
 ```
 lambda/py/lamnda_uploadフォルダが作成される。
 また、.ask/configファイルが更新されるが、この更新されたファイルはgit commitしないように。
