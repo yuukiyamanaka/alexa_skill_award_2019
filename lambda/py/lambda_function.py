@@ -1,10 +1,24 @@
 # -*- coding: utf-8 -*-
 
-import json
-"120行目付近にTODO　診断アルゴリズム挿入があります．"
+# This sample demonstrates handling intents from an Alexa skill using the Alexa Skills Kit SDK for Python.
+# Please visit https://alexa.design/cookbook for additional examples on implementing slots, dialog management,
+# session persistence, api calls, and more.
+# This sample is built using the handler classes approach in skill builder.
+import logging
+
+from ask_sdk_core.skill_builder import SkillBuilder
+from ask_sdk_core.dispatch_components import AbstractRequestHandler
+from ask_sdk_core.dispatch_components import AbstractExceptionHandler
+import ask_sdk_core.utils as ask_utils
+from ask_sdk_core.handler_input import HandlerInput
+
+from ask_sdk_model import Response
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 "質問の回答をbool型で保存"
-anslist = []
+ans_level = 0
 "セッション（会話）の種類を定数で定義"
 "何もない最初の状態"
 _NORMAL_ = 0
@@ -17,169 +31,224 @@ _FREE_ = 0
 "最初はノーマル"
 sessionFlag =_NORMAL_
 
-'最初の質問'
-welcom_mes = 'こんにちは．診断と言っていただければ，あなたにオススメの食べ物を考えてみます．'
-"診断でバグ，例外が怒った時のメッセージ"
-miss_mes = 'すみません．診断に失敗しました'
-"中断，キャンセルと言われた時のメッセージ"
-bye_mes = "ありがとうございました．お大事に"
+class CounselingIntentHandler(AbstractRequestHandler):
+    """
+    診断インテントが呼ばれた時のハンドラ
+    ex: 「アレクサ、＜＞で診断して」
+    """
 
-"Yes or Noの質問"
-question1 = '風邪っぽいですか'
-question2 = '体の疲れ，筋肉痛やだるさはありますか'
-question3 = '食欲はありますか'
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("CounselingIntent")(handler_input)
 
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        session_atr = handler_input.attributes_manager.session_attributes
+        if not 'level' in session_atr.keys():
+            session_atr['level'] = 0
+        print(handler_input)
+        print(session_atr)
+        level = session_atr['level']
+        speak_output = ""
 
-"今のルーチンはどんな種類の会話なのか"
-class BaseSpeech:
-    """シンプルな、発話するレスポンスのベース"""
-    
-    def __init__(self, speech_text, should_end_session, session_attributes=None):
-        """初期化処理
-            
-            引数:
-            speech_text: Alexaに喋らせたいテキスト
-            should_end_session: このやり取りでスキルを終了させる場合はTrue, 続けるならFalse
-            session_attributes: 引き継ぎたいデータが入った辞書
-            """
-        if session_attributes is None:
-            session_attributes = {}
+        if level == 0:
+            speak_output = "風邪っぽいですか"
+        elif level == 1:
+            speak_output = "食欲はありますか"
+        else:
+            speak_output = "症状を教えてください"
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .ask(speak_output)
+                .response
+        )
+
+class LaunchRequestHandler(AbstractRequestHandler):
+    """
+    起動時に呼ばれるハンドラ
+    ex: 「アレクサ、＜＞を開いて」
+    """
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
         
-        # 最終的に返却するレスポンス内容。これを各メソッドで上書き・修正していく
-        self._response = {
-            'version': '1.0',
-            'sessionAttributes': session_attributes,
-            'response': {
-                'outputSpeech': {
-                    'type': 'PlainText',
-                    'text': speech_text
-                },
-                'shouldEndSession': should_end_session,
-            },
-        }
+        return ask_utils.is_request_type("LaunchRequest")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = 'こんにちは．診断と言っていただければ，あなたにオススメの食べ物を考えてみます．'
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .ask(speak_output)
+                .response
+        )
+
+class YesIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("AMAZON.YesIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        session_atr = handler_input.attributes_manager.session_attributes
+        if not 'level' in session_atr.keys():
+            # 何も診断していないので不正なリクエストとして処理
+            CatchAllExceptionHandler.handle(handler_input)
+            return
         
-        # 取り出しやすいよう、インスタンスの属性に
-        self.speech_text = speech_text
-        self.should_end_session = should_end_session
-        self.session_attributes = session_attributes
+        level = session_atr['level']
+        if level == 0:
+            # 風邪に対する解答
+            SessionEndedRequestHandler.handle(handler_input)
+        elif level == 1:
+            # 食欲増進
+            SessionEndedRequestHandler.handle(handler_input)
+        else:
+            # もう一度いう
+            CounselingIntentHandler.handle(handler_input)
 
-    def simple_card(self, title, text=None):
-        """シンプルなカードを追加する"""
-        if text is None:
-            text = self.speech_text
-        card = {
-            'type': 'Simple',
-                'title': title,
-                'content': text,
-            }
-        self._response['response']['card'] = card
-        return self
-    
-    def build(self):
-        """最後にこのメソッドを呼んでください..."""
-        return self._response
+class NoIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("AMAZON.NoIntent")(handler_input)
 
-
-class OneSpeech(BaseSpeech):
-    """1度だけ発話する(ユーザーの返事は待たず、スキル終了)"""
-    
-    def __init__(self, speech_text, session_attributes=None):
-        super().__init__(speech_text, True, session_attributes)
-
-
-class QuestionSpeech(BaseSpeech):
-    """発話し、ユーザーの返事を待つ"""
-    
-    def __init__(self, speech_text, session_attributes=None):
-        super().__init__(speech_text, False, session_attributes)
-    
-    def reprompt(self, text):
-        """リプロンプトを追加する"""
-        reprompt = {
-            'outputSpeech': {
-                'type': 'PlainText',
-                'text': text
-            }
-        }
-        self._response['response']['reprompt'] = reprompt
-        return self
-
-def diagnosis():
-    """ハローと言っておわり"""
-    global sessionFlag
-    if len(anslist) == 0 :
-        return QuestionSpeech(question1).reprompt('よく聞こえませんでした').build()
-    elif len(anslist) == 1 :
-        return QuestionSpeech(question2).reprompt('よく聞こえませんでした').build()
-    elif len(anslist) == 2 :
-        return QuestionSpeech(question3).reprompt('よく聞こえませんでした').build()
-    elif len(anslist) == 3 :
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        session_atr = handler_input.attributes_manager.session_attributes
+        if not 'level' in session_atr.keys():
+            # 何も診断していないので不正なリクエストとして処理
+            CatchAllExceptionHandler.handle(handler_input)
+            return
         
-        "resultに演算結果を入れてください．今は何を聞いてもカレーと答えます．このコードを書いたときにカレーが食べたかったからです．"
-        result = 'カレー'
-        "TODO******診断アルゴリズム*******"
+        session_atr['level'] += 1
         
-        "*********************************"
-        "診断結果配列の初期化"
-        anslist.clear()
-        "セッションの状態を初期の状態に"
-        sessionFlag = _NORMAL_
-        return OneSpeech('診断ができました．'+result +'がオススメです').simple_card('遊んでくれてありがとう!').build()
-    return QuestionSpeech(miss_mes).reprompt('よく聞こえませんでした').build()
+        return CounselingIntentHandler.handle(self, handler_input)
 
-def yescount():
-    "anslistにtrueを追加することではいを回答したことを設定"
-    anslist.append(True)
-    return diagnosis()
+class HelpIntentHandler(AbstractRequestHandler):
+    """
+    Alexa組み込みインテントHelpインテントが呼ばれた時のハンドラ
+    ex: 「アレクサ、＜＞でヘルプ」
+    """
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("AMAZON.HelpIntent")(handler_input)
 
-def nocount():
-    "anslistにfalse を追加することでいいえと回答したことを設定"
-    anslist.append(False)
-    return diagnosis()
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "You can say hello to me! How can I help?"
 
-def welcome():
-    """ようこそと言って、ユーザーの返事を待つ"""
-    return QuestionSpeech(welcom_mes).reprompt('よく聞こえませんでした').build()
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .ask(speak_output)
+                .response
+        )
 
-def repeat():
-    """ようこそと言って、ユーザーの返事を待つ"""
-    return QuestionSpeech('ごめんなさい．もう一度言ってください．').reprompt('よく聞こえませんでした').build()
+class CancelOrStopIntentHandler(AbstractRequestHandler):
+    """
+    Alexa組み込みインテントのキャンセルインテントまたはストップインテントが呼ばれた時のハンドラ
+    ex: 「アレクサ、＜＞をやめる」
+    """
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return (ask_utils.is_intent_name("AMAZON.CancelIntent")(handler_input) or
+                ask_utils.is_intent_name("AMAZON.StopIntent")(handler_input))
 
-def bye():
-    """グッバーイといって終わる"""
-    return OneSpeech(bye_mes).simple_card('遊んでくれてありがとう!').build()
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "ありがとうございました．お大事に!"
 
-def lambda_handler(event, context):
-    """最初に呼び出される関数"""
-    # リクエストの種類を取得
-    request = event['request']
-    request_type = request['type']
-    "グローバル変数のフラグを使うことを宣言"
-    global sessionFlag
-    # LaunchRequestは、特定のインテントを提供することなく、ユーザーがスキルを呼び出すときに送信される...
-    # つまり、「アレクサ、ハローワールドを開いて」のようなメッセージ
-    # 「アレクサ、ハローワールドで挨拶しろ」と言うとこれはインテントを含むので、IntentRequestになる
-    if request_type == 'LaunchRequest':
-        return welcome()
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .response
+        )
 
-    # 何らかのインテントだった場合
-    elif request_type == 'IntentRequest':
-        intent_name = request['intent']['name']
-        
-        # 「診断」「聞かせて」等で呼ばれる。サンプル発話に書いた部分
-        if intent_name == 'ChoseNutIntent':
-            
-            sessionFlag = _DIAGNOSIS_
-            return diagnosis()
-        elif (intent_name == 'YesIntent') and sessionFlag == _DIAGNOSIS_:
-            return yescount()
-        elif intent_name == 'NoIntent' and sessionFlag == _DIAGNOSIS_:
-            return nocount()
-        # 「ヘルプ」「どうすればいいの」「使い方を教えて」で呼ばれる、組み込みインテント
-        elif intent_name == 'AMAZON.HelpIntent':
-            return welcome()
-        # 「キャンセル」「取り消し」「やっぱりやめる」等で呼び出される。組み込みのインテント
-        elif intent_name == 'AMAZON.CancelIntent' or intent_name == 'AMAZON.StopIntent':
-            return bye()
-    
-    return repeat()
+class SessionEndedRequestHandler(AbstractRequestHandler):
+    """
+    セッションを終了する際に呼ばれるハンドラ
+    クリーンアップする類の処理を行う
+    """
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_request_type("SessionEndedRequest")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+
+        # Any cleanup logic goes here.
+
+        return handler_input.response_builder.response
+
+class IntentReflectorHandler(AbstractRequestHandler):
+    """
+    インテントが呼び出されたかを確認できるデバッグ用のハンドラ
+
+    The intent reflector is used for interaction model testing and debugging.
+    It will simply repeat the intent the user said. You can create custom handlers
+    for your intents by defining them above, then also adding them to the request
+    handler chain below.
+    """
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_request_type("IntentRequest")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        intent_name = ask_utils.get_intent_name(handler_input)
+        speak_output = "You just triggered " + intent_name + "."
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                # .ask("add a reprompt if you want to keep the session open for the user to respond")
+                .response
+        )
+
+class CatchAllExceptionHandler(AbstractExceptionHandler):
+    """
+    エラーが発生した場合に呼び出されるハンドラ
+
+    Generic error handling to capture any syntax or routing errors. If you receive an error
+    stating the request handler chain is not found, you have not implemented a handler for
+    the intent being invoked or included it in the skill builder below.
+    """
+    def can_handle(self, handler_input, exception):
+        # type: (HandlerInput, Exception) -> bool
+        return True
+
+    def handle(self, handler_input, exception):
+        # type: (HandlerInput, Exception) -> Response
+        logger.error(exception, exc_info=True)
+
+        speak_output = "Sorry, I had trouble doing what you asked. Please try again."
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .ask(speak_output)
+                .response
+        )
+
+# The SkillBuilder object acts as the entry point for your skill, routing all request and response
+# payloads to the handlers above. Make sure any new handlers or interceptors you've
+# defined are included below. The order matters - they're processed top to bottom.
+
+sb = SkillBuilder()
+
+sb.add_request_handler(LaunchRequestHandler())
+sb.add_request_handler(HelpIntentHandler())
+sb.add_request_handler(CounselingIntentHandler())
+sb.add_request_handler(CancelOrStopIntentHandler())
+sb.add_request_handler(SessionEndedRequestHandler())
+sb.add_request_handler(YesIntentHandler())
+sb.add_request_handler(NoIntentHandler())
+# make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
+sb.add_request_handler(IntentReflectorHandler())
+# error handler
+sb.add_exception_handler(CatchAllExceptionHandler())
+
+handler = sb.lambda_handler()
