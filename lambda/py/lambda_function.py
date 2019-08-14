@@ -17,20 +17,6 @@ from ask_sdk_model import Response
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-"質問の回答をbool型で保存"
-ans_level = 0
-"セッション（会話）の種類を定数で定義"
-"何もない最初の状態"
-_NORMAL_ = 0
-"診断モード"
-_DIAGNOSIS_ = 1
-"自由会話モード"
-_FREE_ = 0
-
-"ルーチンの種類を示すフラグ"
-"最初はノーマル"
-sessionFlag =_NORMAL_
-
 class CounselingIntentHandler(AbstractRequestHandler):
     """
     診断インテントが呼ばれた時のハンドラ
@@ -44,10 +30,15 @@ class CounselingIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
         session_atr = handler_input.attributes_manager.session_attributes
+
+        """ 
+        lambda側で変数定義するとコンテナ内部で使い回されるので、色々問題が生じる
+        セッション中の変数はsession_attributessが保持する
+        """
+
         if not 'level' in session_atr.keys():
             session_atr['level'] = 0
-        print(handler_input)
-        print(session_atr)
+
         level = session_atr['level']
         speak_output = ""
 
