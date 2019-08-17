@@ -22,13 +22,18 @@ class AnsweringIntentHandler(AbstractRequestHandler):
     """
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
-        
-        return ask_utils.is_request_type("AnsweringIntent")(handler_input)
+
+        return ask_utils.is_intent_name("AnsweringIntent")(handler_input)
 
     def handle(self, handler_input, answer=None):
         # type: (HandlerInput) -> Response
 
         # TODO スロット値を見てasnwerを判断する
+        value = ask_utils.get_slot(handler_input, "symptom")
+        if value:
+            slot_id = value['resolutions']['resolutionsPerAuthority'][0]['values'][0]['value']['id']
+            print(slot_id)
+            answer = slot_id
 
         if not answer:
             # TODO
@@ -161,6 +166,7 @@ sb = SkillBuilder()
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CounselingIntentHandler())
+sb.add_request_handler(AnsweringIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
 sb.add_request_handler(YesIntentHandler())

@@ -74,6 +74,7 @@
                     "name": "symptom",
                     "values": [
                         {
+                            "id": "A",
                             "name": {
                                 "value": "肩",
                                 "synonyms": [
@@ -83,6 +84,7 @@
                             }
                         },
                         {
+                            "id": "A",
                             "name": {
                                 "value": "頭",
                                 "synonyms": [
