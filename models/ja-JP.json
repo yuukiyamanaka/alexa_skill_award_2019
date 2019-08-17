@@ -53,9 +53,48 @@
                         "栄養",
                         "今日の栄養"
                     ]
+                },
+                {
+                    "name": "AnsweringIntent",
+                    "slots": [
+                        {
+                            "name": "symptom",
+                            "type": "symptom"
+                        }
+                    ],
+                    "samples": [
+                        "{symptom} がある",
+                        "{symptom} が弱い",
+                        "{symptom} が痛い"
+                    ]
                 }
             ],
-            "types": []
+            "types": [
+                {
+                    "name": "symptom",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "肩",
+                                "synonyms": [
+                                    "かた",
+                                    "ショルダー"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "頭",
+                                "synonyms": [
+                                    "あたま",
+                                    "ぽんぽん",
+                                    "ヘッド"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
         }
     }
 }

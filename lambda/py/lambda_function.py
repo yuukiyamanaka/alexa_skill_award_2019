@@ -27,12 +27,9 @@ class AnsweringIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input, answer=None):
         # type: (HandlerInput) -> Response
-        session_atr = handler_input.attributes_manager.session_attributes
-        if not 'level' in session_atr.keys():
-            print("セッション変数が存在していません. AnsweringIntent")
-            return CatchAllExceptionHandler.handle(self, handler_input)
 
-        level = session_atr['level']
+        # TODO スロット値を見てasnwerを判断する
+
         if not answer:
             # TODO
             answer = 'G'
