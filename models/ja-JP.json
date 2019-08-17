@@ -65,7 +65,23 @@
                     "samples": [
                         "{symptom} がある",
                         "{symptom} が弱い",
-                        "{symptom} が痛い"
+                        "{symptom} がする",
+                        "{symptom} がない",
+                        "{symptom} が出ない",
+                        "{symptom} が疲れた",
+                        "{symptom} できない",
+                        "{symptom} ない",
+                        "{symptom} の疲れ",
+                        "{symptom}"
+                    ]
+                },
+                {
+                    "name": "AdditionalIntent",
+                    "samples": [
+                        "他には",
+                        "その他",
+                        "それ以外",
+                        "それ以外には"
                     ]
                 }
             ],
