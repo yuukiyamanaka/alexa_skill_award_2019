@@ -17,16 +17,7 @@ from handlers import HelpIntentHandler, CancelOrStopIntentHandler, SessionEndedR
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
-ANSWER = {
-    'A': ["A"],
-    'B': ["B"],
-    'C': ["C"],
-    'D': ["納豆", "レバー", "すじこ", "アボカド"],
-    'E': ["レモン", "ピーマン", "キウイ", "ゴーヤ"],
-    'F': ["F"],
-    'G': ["G"]
-}
+from answers import ANSWER
 
 class AnsweringIntentHandler(AbstractRequestHandler):
     """
