@@ -17,6 +17,53 @@ from ask_sdk_model import Response
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+ANSWER = {
+    'A': ["A"],
+    'B': ["B"],
+    'C': ["C"],
+    'D': ["納豆", "レバー", "すじこ", "アボカド"],
+    'E': ["レモン", "ピーマン", "キウイ", "ゴーヤ"],
+    'F': ["F"],
+    'G': ["G"]
+}
+
+class AnsweringIntentHandler(AbstractRequestHandler):
+    """
+    ユーザーが症状を回答したときに呼び出されるハンドラ
+    ex: 「頭が痛い」
+    """
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        
+        return ask_utils.is_request_type("AnsweringIntent")(handler_input)
+
+    def handle(self, handler_input, answer=None):
+        # type: (HandlerInput) -> Response
+        session_atr = handler_input.attributes_manager.session_attributes
+        if not 'level' in session_atr.keys():
+            print("セッション変数が存在していません. AnsweringIntent")
+            return CatchAllExceptionHandler.handle(self, handler_input)
+
+        level = session_atr['level']
+        if not answer:
+            # TODO
+            answer = 'G'
+        
+        # セッション変数に答えをいれておく
+        handler_input.attributes_manager.session_attributes['answer'] = answer
+        
+        print("疲労の種類は%sです" % answer)
+
+        food = ANSWER[answer][0]
+        speak_output = 'あなたにオススメの食べ物は%sです。他の候補が知りたいときは、他には、と聞いてください' % food
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .ask(speak_output)
+                .response
+        )
+
 class CounselingIntentHandler(AbstractRequestHandler):
     """
     診断インテントが呼ばれた時のハンドラ
@@ -37,7 +84,7 @@ class CounselingIntentHandler(AbstractRequestHandler):
         """
 
         if not 'level' in session_atr.keys():
-            session_atr['level'] = 0
+            handler_input.attributes_manager.session_attributes['level'] = 0
 
         level = session_atr['level']
         speak_output = ""
@@ -87,19 +134,20 @@ class YesIntentHandler(AbstractRequestHandler):
         session_atr = handler_input.attributes_manager.session_attributes
         if not 'level' in session_atr.keys():
             # 何も診断していないので不正なリクエストとして処理
-            CatchAllExceptionHandler.handle(handler_input)
+            print("セッション変数が存在していません. YesIntent")
+            CatchAllExceptionHandler.handle(self, handler_input)
             return
         
         level = session_atr['level']
         if level == 0:
             # 風邪に対する解答
-            SessionEndedRequestHandler.handle(handler_input)
-        elif level == 1:
-            # 食欲増進
-            SessionEndedRequestHandler.handle(handler_input)
+            return AnsweringIntentHandler.handle(self, handler_input, 'E')
+        if level == 1:
+            # 食欲不振
+            return AnsweringIntentHandler.handle(self, handler_input, 'B')
         else:
             # もう一度いう
-            CounselingIntentHandler.handle(handler_input)
+            return CounselingIntentHandler.handle(self, handler_input)
 
 class NoIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -111,7 +159,7 @@ class NoIntentHandler(AbstractRequestHandler):
         session_atr = handler_input.attributes_manager.session_attributes
         if not 'level' in session_atr.keys():
             # 何も診断していないので不正なリクエストとして処理
-            CatchAllExceptionHandler.handle(handler_input)
+            CatchAllExceptionHandler.handle(self, handler_input)
             return
         
         session_atr['level'] += 1
@@ -215,7 +263,7 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
         # type: (HandlerInput, Exception) -> Response
         logger.error(exception, exc_info=True)
 
-        speak_output = "Sorry, I had trouble doing what you asked. Please try again."
+        speak_output = "すみません。何かの問題が発生しました。最初からやり直してください。"
 
         return (
             handler_input.response_builder
