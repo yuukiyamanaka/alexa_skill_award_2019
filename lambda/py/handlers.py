@@ -1,9 +1,14 @@
+import logging
+
 from ask_sdk_core.skill_builder import SkillBuilder
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
 from ask_sdk_core.dispatch_components import AbstractExceptionHandler
 import ask_sdk_core.utils as ask_utils
 from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_model import Response
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 class HelpIntentHandler(AbstractRequestHandler):
     """
@@ -61,6 +66,27 @@ class SessionEndedRequestHandler(AbstractRequestHandler):
 
         return handler_input.response_builder.response
 
+class FallbackIntentHandler(AbstractRequestHandler):
+    """
+    ユーザーの発話がどのインテントにも該当しない場合
+    ex: 「今日の天気は？」
+    """
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_request_type("AMAZON.FallbackIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+
+        speak_output = "その言葉にはお答えできませんが、疲れの種類を教えてもらえれば、オススメの食べ物を考えてみます。"
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .ask(speak_output)
+                .response
+        )
+
 class IntentReflectorHandler(AbstractRequestHandler):
     """
     インテントが呼び出されたかを確認できるデバッグ用のハンドラ
@@ -77,7 +103,7 @@ class IntentReflectorHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
         intent_name = ask_utils.get_intent_name(handler_input)
-        speak_output = "You just triggered " + intent_name + "."
+        speak_output = intent_name + "が呼び出されました"
 
         return (
             handler_input.response_builder

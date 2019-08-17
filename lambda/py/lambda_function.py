@@ -4,7 +4,6 @@
 # Please visit https://alexa.design/cookbook for additional examples on implementing slots, dialog management,
 # session persistence, api calls, and more.
 # This sample is built using the handler classes approach in skill builder.
-import logging
 
 from ask_sdk_core.skill_builder import SkillBuilder
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
@@ -13,10 +12,7 @@ import ask_sdk_core.utils as ask_utils
 from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_model import Response
 
-from handlers import HelpIntentHandler, CancelOrStopIntentHandler, SessionEndedRequestHandler, IntentReflectorHandler, CatchAllExceptionHandler
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+from handlers import HelpIntentHandler, CancelOrStopIntentHandler, SessionEndedRequestHandler, IntentReflectorHandler, CatchAllExceptionHandler, FallbackIntentHandler
 from answers import ANSWER
 
 class AnsweringIntentHandler(AbstractRequestHandler):
@@ -127,7 +123,7 @@ class YesIntentHandler(AbstractRequestHandler):
         if not 'level' in session_atr.keys():
             # 何も診断していないので不正なリクエストとして処理
             print("セッション変数が存在していません. YesIntent")
-            CatchAllExceptionHandler.handle(self, handler_input)
+            FallbackIntentHandler.handle(self, handler_input)
             return
         
         level = session_atr['level']
@@ -151,7 +147,8 @@ class NoIntentHandler(AbstractRequestHandler):
         session_atr = handler_input.attributes_manager.session_attributes
         if not 'level' in session_atr.keys():
             # 何も診断していないので不正なリクエストとして処理
-            CatchAllExceptionHandler.handle(self, handler_input)
+            print("セッション変数が存在していません. NoIntent")
+            FallbackIntentHandler.handle(self, handler_input)
             return
         
         session_atr['level'] += 1
@@ -171,6 +168,7 @@ sb.add_request_handler(CancelOrStopIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
 sb.add_request_handler(YesIntentHandler())
 sb.add_request_handler(NoIntentHandler())
+sb.add_request_handler(FallbackIntentHandler())
 # make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
 sb.add_request_handler(IntentReflectorHandler())
 # error handler
