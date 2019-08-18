@@ -4,23 +4,117 @@
 # Please visit https://alexa.design/cookbook for additional examples on implementing slots, dialog management,
 # session persistence, api calls, and more.
 # This sample is built using the handler classes approach in skill builder.
-import logging
+
+import random
 
 from ask_sdk_core.skill_builder import SkillBuilder
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
 from ask_sdk_core.dispatch_components import AbstractExceptionHandler
 import ask_sdk_core.utils as ask_utils
 from ask_sdk_core.handler_input import HandlerInput
-
 from ask_sdk_model import Response
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+from handlers import HelpIntentHandler, CancelOrStopIntentHandler, SessionEndedRequestHandler, IntentReflectorHandler, CatchAllExceptionHandler, FallbackIntentHandler
+from answers import ANSWER
+
+class AnsweringIntentHandler(AbstractRequestHandler):
+    """
+    ユーザーが症状を回答したときに呼び出されるハンドラ
+    ex: 「頭が痛い」
+    """
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+
+        return ask_utils.is_intent_name("AnsweringIntent")(handler_input)
+
+    def handle(self, handler_input, answer_category=None):
+        # type: (HandlerInput) -> Response
+
+        # TODO スロット値を見てasnwerを判断する
+        slot = ask_utils.get_slot(handler_input, "symptom")
+
+        if slot:
+            # TODO
+            """
+            適当な単語をいれた時にstatus = ER_SUCCESS_NO_MATCHになるのをチェックしてfallbackする
+            """
+
+            slot_id = slot.resolutions.resolutions_per_authority[0].values[0].value.id
+            answer_category = slot_id
+
+        if not answer_category:
+            # TODO
+            answer_category = 'G'
+        
+        # セッション変数に答えをいれておく
+        handler_input.attributes_manager.session_attributes['answer_category'] = answer_category
+        
+        print("疲労の種類は%sです" % answer_category)
+
+        food = random.choice(ANSWER[answer_category])
+        # 回答済みの答えもいれておく
+        handler_input.attributes_manager.session_attributes['answered_foods'] = [food]
+        speak_output = 'あなたにオススメの食べ物は%sです。他の候補が知りたいときは、他には、と聞いてください' % food
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .ask(speak_output)
+                .response
+        )
+
+class AdditionalIntentHandler(AbstractRequestHandler):
+    """
+    ユーザーがそのほかの食べ物を要求した場合
+    ex: 「他には？」
+    """
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+
+        return ask_utils.is_intent_name("AdditionalIntent")(handler_input)
+
+    def handle(self, handler_input, answer=None):
+        # type: (HandlerInput) -> Response
+
+        answer_category = handler_input.attributes_manager.session_attributes['answer_category']
+        answered_foods = handler_input.attributes_manager.session_attributes['answered_foods']
+
+        if not answer_category:
+            return CounselingIntentHandler.handle(self, handler_input)
+
+        speak_output = 'すみません。ほかの候補がもうありません。'
+
+        answers = ANSWER[answer_category]
+
+        if len(answered_foods) != len(answers):
+            answer = random.choice(answers)
+
+            i = 0
+            while (answer in answered_foods) and i < 10:
+                answer = random.choice(answers)
+                i += 1
+            
+            handler_input.attributes_manager.session_attributes['answered_foods'].append(answer)
+
+            speak_output = 'あなたにオススメの食べ物は%sです。他の候補が知りたいときは、他には、と聞いてください' % answer
+
+            return (
+                handler_input.response_builder
+                    .speak(speak_output)
+                    .ask(speak_output)
+                    .response
+            )
+        
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .response
+        )
 
 class CounselingIntentHandler(AbstractRequestHandler):
     """
     診断インテントが呼ばれた時のハンドラ
-    ex: 「アレクサ、＜＞で診断して」
+    ex: 「診断」
     """
 
     def can_handle(self, handler_input):
@@ -37,7 +131,7 @@ class CounselingIntentHandler(AbstractRequestHandler):
         """
 
         if not 'level' in session_atr.keys():
-            session_atr['level'] = 0
+            handler_input.attributes_manager.session_attributes['level'] = 0
 
         level = session_atr['level']
         speak_output = ""
@@ -87,19 +181,20 @@ class YesIntentHandler(AbstractRequestHandler):
         session_atr = handler_input.attributes_manager.session_attributes
         if not 'level' in session_atr.keys():
             # 何も診断していないので不正なリクエストとして処理
-            CatchAllExceptionHandler.handle(handler_input)
+            print("セッション変数が存在していません. YesIntent")
+            FallbackIntentHandler.handle(self, handler_input)
             return
         
         level = session_atr['level']
         if level == 0:
             # 風邪に対する解答
-            SessionEndedRequestHandler.handle(handler_input)
-        elif level == 1:
-            # 食欲増進
-            SessionEndedRequestHandler.handle(handler_input)
+            return AnsweringIntentHandler.handle(self, handler_input, 'E')
+        if level == 1:
+            # 食欲不振
+            return AnsweringIntentHandler.handle(self, handler_input, 'B')
         else:
             # もう一度いう
-            CounselingIntentHandler.handle(handler_input)
+            return CounselingIntentHandler.handle(self, handler_input)
 
 class NoIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -111,118 +206,13 @@ class NoIntentHandler(AbstractRequestHandler):
         session_atr = handler_input.attributes_manager.session_attributes
         if not 'level' in session_atr.keys():
             # 何も診断していないので不正なリクエストとして処理
-            CatchAllExceptionHandler.handle(handler_input)
+            print("セッション変数が存在していません. NoIntent")
+            FallbackIntentHandler.handle(self, handler_input)
             return
         
         session_atr['level'] += 1
         
         return CounselingIntentHandler.handle(self, handler_input)
-
-class HelpIntentHandler(AbstractRequestHandler):
-    """
-    Alexa組み込みインテントHelpインテントが呼ばれた時のハンドラ
-    ex: 「アレクサ、＜＞でヘルプ」
-    """
-    def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        return ask_utils.is_intent_name("AMAZON.HelpIntent")(handler_input)
-
-    def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-        speak_output = "You can say hello to me! How can I help?"
-
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                .ask(speak_output)
-                .response
-        )
-
-class CancelOrStopIntentHandler(AbstractRequestHandler):
-    """
-    Alexa組み込みインテントのキャンセルインテントまたはストップインテントが呼ばれた時のハンドラ
-    ex: 「アレクサ、＜＞をやめる」
-    """
-    def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        return (ask_utils.is_intent_name("AMAZON.CancelIntent")(handler_input) or
-                ask_utils.is_intent_name("AMAZON.StopIntent")(handler_input))
-
-    def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-        speak_output = "ありがとうございました．お大事に!"
-
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                .response
-        )
-
-class SessionEndedRequestHandler(AbstractRequestHandler):
-    """
-    セッションを終了する際に呼ばれるハンドラ
-    クリーンアップする類の処理を行う
-    """
-    def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        return ask_utils.is_request_type("SessionEndedRequest")(handler_input)
-
-    def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-
-        # Any cleanup logic goes here.
-
-        return handler_input.response_builder.response
-
-class IntentReflectorHandler(AbstractRequestHandler):
-    """
-    インテントが呼び出されたかを確認できるデバッグ用のハンドラ
-
-    The intent reflector is used for interaction model testing and debugging.
-    It will simply repeat the intent the user said. You can create custom handlers
-    for your intents by defining them above, then also adding them to the request
-    handler chain below.
-    """
-    def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        return ask_utils.is_request_type("IntentRequest")(handler_input)
-
-    def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-        intent_name = ask_utils.get_intent_name(handler_input)
-        speak_output = "You just triggered " + intent_name + "."
-
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                # .ask("add a reprompt if you want to keep the session open for the user to respond")
-                .response
-        )
-
-class CatchAllExceptionHandler(AbstractExceptionHandler):
-    """
-    エラーが発生した場合に呼び出されるハンドラ
-
-    Generic error handling to capture any syntax or routing errors. If you receive an error
-    stating the request handler chain is not found, you have not implemented a handler for
-    the intent being invoked or included it in the skill builder below.
-    """
-    def can_handle(self, handler_input, exception):
-        # type: (HandlerInput, Exception) -> bool
-        return True
-
-    def handle(self, handler_input, exception):
-        # type: (HandlerInput, Exception) -> Response
-        logger.error(exception, exc_info=True)
-
-        speak_output = "Sorry, I had trouble doing what you asked. Please try again."
-
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                .ask(speak_output)
-                .response
-        )
 
 # The SkillBuilder object acts as the entry point for your skill, routing all request and response
 # payloads to the handlers above. Make sure any new handlers or interceptors you've
@@ -233,10 +223,13 @@ sb = SkillBuilder()
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CounselingIntentHandler())
+sb.add_request_handler(AnsweringIntentHandler())
+sb.add_request_handler(AdditionalIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
 sb.add_request_handler(YesIntentHandler())
 sb.add_request_handler(NoIntentHandler())
+sb.add_request_handler(FallbackIntentHandler())
 # make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
 sb.add_request_handler(IntentReflectorHandler())
 # error handler

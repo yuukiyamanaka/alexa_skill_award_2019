@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "栄養",
+            "invocationName": "お疲れサプリ",
             "intents": [
                 {
                     "name": "AMAZON.FallbackIntent",
@@ -53,9 +53,162 @@
                         "栄養",
                         "今日の栄養"
                     ]
+                },
+                {
+                    "name": "AnsweringIntent",
+                    "slots": [
+                        {
+                            "name": "symptom",
+                            "type": "symptom"
+                        }
+                    ],
+                    "samples": [
+                        "{symptom} がある",
+                        "{symptom} が弱い",
+                        "{symptom} がする",
+                        "{symptom} がない",
+                        "{symptom} が出ない",
+                        "{symptom} が疲れた",
+                        "{symptom} できない",
+                        "{symptom} ない",
+                        "{symptom} する",
+                        "{symptom} の疲れ",
+                        "{symptom}"
+                    ]
+                },
+                {
+                    "name": "AdditionalIntent",
+                    "samples": [
+                        "他には",
+                        "他",
+                        "他に",
+                        "その他",
+                        "それ以外",
+                        "それ以外には"
+                    ]
                 }
             ],
-            "types": []
+            "types": [
+                {
+                    "name": "symptom",
+                    "values": [
+                        {
+                            "id": "A",
+                            "name": {
+                                "value": "倦怠感",
+                                "synonyms": [
+                                    "ダルい",
+                                    "ダルさ",
+                                    "やる気",
+                                    "する気"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "B",
+                            "name": {
+                                "value": "食欲不振",
+                                "synonyms": [
+                                    "食欲",
+                                    "食べれ",
+                                    "食べる",
+                                    "お腹が空かない"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "C",
+                            "name": {
+                                "value": "自律神経",
+                                "synonyms": [
+                                    "集中力",
+                                    "集中",
+                                    "ボーッと",
+                                    "ぼーっと",
+                                    "持続",
+                                    "イライラ",
+                                    "ムカムカ",
+                                    "動悸",
+                                    "めまい",
+                                    "貧血",
+                                    "耳鳴り",
+                                    "不眠",
+                                    "眠れない",
+                                    "寝不足"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "D",
+                            "name": {
+                                "value": "代謝ダウン",
+                                "synonyms": [
+                                    "肌",
+                                    "冷え性",
+                                    "寒い",
+                                    "疲れやすい",
+                                    "生理",
+                                    "便秘",
+                                    "便",
+                                    "消化"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "E",
+                            "name": {
+                                "value": "免疫力",
+                                "synonyms": [
+                                    "体調",
+                                    "風邪",
+                                    "熱",
+                                    "喉",
+                                    "吐き気"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "F1",
+                            "name": {
+                                "value": "眼精疲労",
+                                "synonyms": [
+                                    "目"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "F2",
+                            "name": {
+                                "value": "肩こり",
+                                "synonyms": [
+                                    "肩"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "F3",
+                            "name": {
+                                "value": "思考",
+                                "synonyms": [
+                                    "頭",
+                                    "脳",
+                                    "頭の使いすぎ"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "G",
+                            "name": {
+                                "value": "その他",
+                                "synonyms": [
+                                    "わからない",
+                                    "不明"
+                                ]
+                            }
+                        }
+                      ]
+                }
+            ]
         }
     }
 }
