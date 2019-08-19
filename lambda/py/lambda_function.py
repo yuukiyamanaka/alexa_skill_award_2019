@@ -13,9 +13,10 @@ from ask_sdk_core.dispatch_components import AbstractExceptionHandler
 import ask_sdk_core.utils as ask_utils
 from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_model import Response
+from ask_sdk_model.slu.entityresolution.status_code import StatusCode
 
 from handlers import HelpIntentHandler, CancelOrStopIntentHandler, SessionEndedRequestHandler, IntentReflectorHandler, CatchAllExceptionHandler, FallbackIntentHandler
-from answers import ANSWER
+from answers import ANSWER, VITAMIN
 
 class AnsweringIntentHandler(AbstractRequestHandler):
     """
@@ -30,31 +31,46 @@ class AnsweringIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input, answer_category=None):
         # type: (HandlerInput) -> Response
 
-        # TODO スロット値を見てasnwerを判断する
         slot = ask_utils.get_slot(handler_input, "symptom")
 
         if slot:
-            # TODO
-            """
-            適当な単語をいれた時にstatus = ER_SUCCESS_NO_MATCHになるのをチェックしてfallbackする
-            """
+            # スロット値がマッチしてないとき
+            if slot.resolutions.resolutions_per_authority[0].status.code != StatusCode.ER_SUCCESS_MATCH:
+                print("マッチしませんでした")
+                return FallbackIntentHandler.handle(self, handler_input)
 
             slot_id = slot.resolutions.resolutions_per_authority[0].values[0].value.id
             answer_category = slot_id
 
         if not answer_category:
-            # TODO
-            answer_category = 'G'
+            # エラーハンドリング
+            print("カテゴリが見つかりませんでした")
+            return CatchAllExceptionHandler.handle(self, handler_input)
         
         # セッション変数に答えをいれておく
         handler_input.attributes_manager.session_attributes['answer_category'] = answer_category
         
         print("疲労の種類は%sです" % answer_category)
 
+        vitamin = VITAMIN[answer_category]
         food = random.choice(ANSWER[answer_category])
         # 回答済みの答えもいれておく
         handler_input.attributes_manager.session_attributes['answered_foods'] = [food]
-        speak_output = 'あなたにオススメの食べ物は%sです。他の候補が知りたいときは、他には、と聞いてください' % food
+
+        # Fの場合だけ特別
+        if answer_category in ["F1", "F2", "F3"]:
+            f_vitamin = VITAMIN["F"]
+            f_food = random.choice(ANSWER["F"])
+            handler_input.attributes_manager.session_attributes['f_answered_foods'] = [f_food]
+
+            vitamin = vitamin + 'と' + f_vitamin
+            food = food + 'と' + f_food
+
+        speak_output = '%sを摂取するといいかもしれません。オススメの食べ物は%sです。ほかの候補が知りたいときは、ほかには、と聞いてください' % (vitamin, food)
+
+        # そのほかの場合baai
+        if answer_category == 'G':
+            speak_output = 'ちょっとわかりませんが、' + speak_output
 
         return (
             handler_input.response_builder
@@ -79,8 +95,15 @@ class AdditionalIntentHandler(AbstractRequestHandler):
         answer_category = handler_input.attributes_manager.session_attributes['answer_category']
         answered_foods = handler_input.attributes_manager.session_attributes['answered_foods']
 
-        if not answer_category:
-            return CounselingIntentHandler.handle(self, handler_input)
+        # answer_category or answerd_foodがない時
+        if not answer_category or not answered_foods:
+            speak_output = 'まだ診断ができていませんね。診断と言っていただければ、あなたにオススメの食べ物を考えてみます。'
+            return (
+                handler_input.response_builder
+                    .speak(speak_output)
+                    .ask(speak_output)
+                    .response
+            )
 
         speak_output = 'すみません。ほかの候補がもうありません。'
 
@@ -90,13 +113,32 @@ class AdditionalIntentHandler(AbstractRequestHandler):
             answer = random.choice(answers)
 
             i = 0
-            while (answer in answered_foods) and i < 10:
+            while (answer in answered_foods) and i < 20:
                 answer = random.choice(answers)
                 i += 1
             
             handler_input.attributes_manager.session_attributes['answered_foods'].append(answer)
 
-            speak_output = 'あなたにオススメの食べ物は%sです。他の候補が知りたいときは、他には、と聞いてください' % answer
+            # Fの場合だけ特別
+            if answer_category in ["F1", "F2", "F3"]:
+                f_answered_foods = handler_input.attributes_manager.session_attributes['f_answered_foods']
+                f_answers = ANSWER["F"]
+
+                f_answer = None
+                if len(f_answered_foods) != len(f_answers):
+                    f_answer = random.choice(f_answers)
+
+                    i = 0
+                    while (f_answer in f_answered_foods) and i < 20:
+                        f_answer = random.choice(f_answers)
+                        i += 1
+
+                    handler_input.attributes_manager.session_attributes['f_answered_foods'].append(f_answer)
+                
+                if f_answer:
+                    answer = answer + 'と' + f_answer
+
+            speak_output = '%sはどうでしょう。さらに知りたいときは、ほかには、と聞いてください' % answer
 
             return (
                 handler_input.response_builder
@@ -125,10 +167,8 @@ class CounselingIntentHandler(AbstractRequestHandler):
         # type: (HandlerInput) -> Response
         session_atr = handler_input.attributes_manager.session_attributes
 
-        """ 
-        lambda側で変数定義するとコンテナ内部で使い回されるので、色々問題が生じる
-        セッション中の変数はsession_attributessが保持する
-        """
+        if 'answer_category' in session_atr.keys():
+            return HelpIntentHandler.handle(self, handler_input)
 
         if not 'level' in session_atr.keys():
             handler_input.attributes_manager.session_attributes['level'] = 0
@@ -139,7 +179,7 @@ class CounselingIntentHandler(AbstractRequestHandler):
         if level == 0:
             speak_output = "風邪っぽいですか"
         elif level == 1:
-            speak_output = "食欲はありますか"
+            speak_output = "食欲がないですか"
         else:
             speak_output = "症状を教えてください"
 
@@ -179,11 +219,14 @@ class YesIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
         session_atr = handler_input.attributes_manager.session_attributes
+
+        # 何も診断していないとき
         if not 'level' in session_atr.keys():
-            # 何も診断していないので不正なリクエストとして処理
-            print("セッション変数が存在していません. YesIntent")
-            FallbackIntentHandler.handle(self, handler_input)
-            return
+            return FallbackIntentHandler.handle(self, handler_input)
+        
+        # すでに解答済みの場合
+        if 'answer_category' in session_atr.keys():
+            return FallbackIntentHandler.handle(self, handler_input)
         
         level = session_atr['level']
         if level == 0:
@@ -204,11 +247,14 @@ class NoIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
         session_atr = handler_input.attributes_manager.session_attributes
+        
+        # 何も診断していないとき
         if not 'level' in session_atr.keys():
-            # 何も診断していないので不正なリクエストとして処理
-            print("セッション変数が存在していません. NoIntent")
-            FallbackIntentHandler.handle(self, handler_input)
-            return
+            return FallbackIntentHandler.handle(self, handler_input)
+        
+        # すでに解答済みの場合
+        if 'answer_category' in session_atr.keys():
+            return FallbackIntentHandler.handle(self, handler_input)
         
         session_atr['level'] += 1
         
@@ -231,7 +277,7 @@ sb.add_request_handler(YesIntentHandler())
 sb.add_request_handler(NoIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
 # make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
-sb.add_request_handler(IntentReflectorHandler())
+# sb.add_request_handler(IntentReflectorHandler())
 # error handler
 sb.add_exception_handler(CatchAllExceptionHandler())
 

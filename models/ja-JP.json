@@ -1,214 +1,225 @@
 {
     "interactionModel": {
-        "languageModel": {
-            "invocationName": "お疲れサプリ",
-            "intents": [
-                {
-                    "name": "AMAZON.FallbackIntent",
-                    "samples": []
-                },
-                {
-                    "name": "AMAZON.CancelIntent",
-                    "samples": [
-                        "やめて",
-                        "中止"
-                    ]
-                },
-                {
-                    "name": "AMAZON.HelpIntent",
-                    "samples": [
-                        "ヘルプ",
-                        "助けて"
-                    ]
-                },
-                {
-                    "name": "AMAZON.StopIntent",
-                    "samples": [
-                        "止めて"
-                    ]
-                },
-                {
-                    "name": "AMAZON.NavigateHomeIntent",
-                    "samples": []
-                },
-                {
-                    "name": "AMAZON.YesIntent",
-                    "samples": []
-                },
-                {
-                    "name": "AMAZON.NoIntent",
-                    "samples": []
-                },
-                {
-                    "name": "CounselingIntent",
-                    "slots": [],
-                    "samples": [
-                        "診断",
-                        "教えて",
-                        "食べよう",
-                        "何食べよう",
-                        "今日のサプリ",
-                        "サプリ",
-                        "えいよう",
-                        "栄養",
-                        "今日の栄養"
-                    ]
-                },
-                {
-                    "name": "AnsweringIntent",
-                    "slots": [
-                        {
-                            "name": "symptom",
-                            "type": "symptom"
-                        }
-                    ],
-                    "samples": [
-                        "{symptom} がある",
-                        "{symptom} が弱い",
-                        "{symptom} がする",
-                        "{symptom} がない",
-                        "{symptom} が出ない",
-                        "{symptom} が疲れた",
-                        "{symptom} できない",
-                        "{symptom} ない",
-                        "{symptom} する",
-                        "{symptom} の疲れ",
-                        "{symptom}"
-                    ]
-                },
-                {
-                    "name": "AdditionalIntent",
-                    "samples": [
-                        "他には",
-                        "他",
-                        "他に",
-                        "その他",
-                        "それ以外",
-                        "それ以外には"
-                    ]
-                }
-            ],
-            "types": [
-                {
-                    "name": "symptom",
-                    "values": [
-                        {
-                            "id": "A",
-                            "name": {
-                                "value": "倦怠感",
-                                "synonyms": [
-                                    "ダルい",
-                                    "ダルさ",
-                                    "やる気",
-                                    "する気"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "B",
-                            "name": {
-                                "value": "食欲不振",
-                                "synonyms": [
-                                    "食欲",
-                                    "食べれ",
-                                    "食べる",
-                                    "お腹が空かない"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "C",
-                            "name": {
-                                "value": "自律神経",
-                                "synonyms": [
-                                    "集中力",
-                                    "集中",
-                                    "ボーッと",
-                                    "ぼーっと",
-                                    "持続",
-                                    "イライラ",
-                                    "ムカムカ",
-                                    "動悸",
-                                    "めまい",
-                                    "貧血",
-                                    "耳鳴り",
-                                    "不眠",
-                                    "眠れない",
-                                    "寝不足"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "D",
-                            "name": {
-                                "value": "代謝ダウン",
-                                "synonyms": [
-                                    "肌",
-                                    "冷え性",
-                                    "寒い",
-                                    "疲れやすい",
-                                    "生理",
-                                    "便秘",
-                                    "便",
-                                    "消化"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "E",
-                            "name": {
-                                "value": "免疫力",
-                                "synonyms": [
-                                    "体調",
-                                    "風邪",
-                                    "熱",
-                                    "喉",
-                                    "吐き気"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "F1",
-                            "name": {
-                                "value": "眼精疲労",
-                                "synonyms": [
-                                    "目"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "F2",
-                            "name": {
-                                "value": "肩こり",
-                                "synonyms": [
-                                    "肩"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "F3",
-                            "name": {
-                                "value": "思考",
-                                "synonyms": [
-                                    "頭",
-                                    "脳",
-                                    "頭の使いすぎ"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "G",
-                            "name": {
-                                "value": "その他",
-                                "synonyms": [
-                                    "わからない",
-                                    "不明"
-                                ]
-                            }
-                        }
-                      ]
-                }
+      "languageModel": {
+        "invocationName": "お疲れサプリ",
+        "intents": [
+          {
+            "name": "AMAZON.FallbackIntent",
+            "samples": []
+          },
+          {
+            "name": "AMAZON.CancelIntent",
+            "samples": []
+          },
+          {
+            "name": "AMAZON.HelpIntent",
+            "samples": []
+          },
+          {
+            "name": "AMAZON.StopIntent",
+            "samples": [
+              "終わる",
+              "終わり",
+              "終了"
             ]
-        }
-    }
-}
+          },
+          {
+            "name": "AMAZON.YesIntent",
+            "samples": []
+          },
+          {
+            "name": "AMAZON.NoIntent",
+            "samples": []
+          },
+          {
+            "name": "CounselingIntent",
+            "slots": [],
+            "samples": [
+              "診断",
+              "教えて",
+              "何食べよう",
+              "何を食べよう",
+              "何を食べたら良い",
+              "今日のサプリ",
+              "サプリ",
+              "栄養",
+              "今日の栄養"
+            ]
+          },
+          {
+            "name": "AnsweringIntent",
+            "slots": [
+              {
+                "name": "symptom",
+                "type": "symptom"
+              }
+            ],
+            "samples": [
+              "何が {symptom} に効く",
+              "{symptom} に効く食べ物",
+              "{symptom} が上がる食べ物",
+              "{symptom} の疲れを和らげる食べ物",
+              "{symptom} の疲れに効く食べ物",
+              "{symptom} がある",
+              "{symptom} が弱い",
+              "{symptom} がする",
+              "{symptom} がない",
+              "{symptom} が出ない",
+              "{symptom} が疲れた",
+              "{symptom} がしんどい",
+              "{symptom} できない",
+              "{symptom} ない",
+              "{symptom} する",
+              "{symptom} してる",
+              "{symptom} した",
+              "{symptom} の疲れ",
+              "{symptom}"
+            ]
+          },
+          {
+            "name": "AdditionalIntent",
+            "samples": [
+              "他には",
+              "ほか",
+              "べつ",
+              "べつには",
+              "他に",
+              "その他",
+              "それ以外",
+              "それ以外には"
+            ]
+          },
+          {
+            "name": "AMAZON.NavigateHomeIntent",
+            "samples": []
+          }
+        ],
+        "types": [
+          {
+            "values": [
+              {
+                "id": "A",
+                "name": {
+                  "value": "倦怠感",
+                  "synonyms": [
+                    "ダルい",
+                    "だるい",
+                    "ダルさ",
+                    "やる気",
+                    "する気",
+                    "ぐったり"
+                  ]
+                }
+              },
+              {
+                "id": "B",
+                "name": {
+                  "value": "食欲不振",
+                  "synonyms": [
+                    "食欲",
+                    "食べれ",
+                    "食べる",
+                    "お腹が空かない"
+                  ]
+                }
+              },
+              {
+                "id": "C",
+                "name": {
+                  "value": "自律神経",
+                  "synonyms": [
+                    "集中力",
+                    "集中",
+                    "ボーッと",
+                    "ぼーっと",
+                    "持続",
+                    "イライラ",
+                    "ムカムカ",
+                    "動悸",
+                    "めまい",
+                    "貧血",
+                    "耳鳴り",
+                    "不眠",
+                    "眠れない",
+                    "寝不足"
+                  ]
+                }
+              },
+              {
+                "id": "D",
+                "name": {
+                  "value": "代謝ダウン",
+                  "synonyms": [
+                    "肌",
+                    "冷え性",
+                    "寒い",
+                    "疲れやすい",
+                    "生理",
+                    "便秘",
+                    "便",
+                    "消化"
+                  ]
+                }
+              },
+              {
+                "id": "E",
+                "name": {
+                  "value": "免疫力",
+                  "synonyms": [
+                    "体調",
+                    "風邪",
+                    "熱",
+                    "喉",
+                    "吐き気"
+                  ]
+                }
+              },
+              {
+                "id": "F1",
+                "name": {
+                  "value": "眼精疲労",
+                  "synonyms": [
+                    "目"
+                  ]
+                }
+              },
+              {
+                "id": "F2",
+                "name": {
+                  "value": "肩こり",
+                  "synonyms": [
+                    "肩",
+                    "肩が重い"
+                  ]
+                }
+              },
+              {
+                "id": "F3",
+                "name": {
+                  "value": "思考",
+                  "synonyms": [
+                    "頭",
+                    "脳",
+                    "頭の使いすぎ"
+                  ]
+                }
+              },
+              {
+                "id": "G",
+                "name": {
+                  "value": "その他",
+                  "synonyms": [
+                    "わからない",
+                    "不明"
+                  ]
+                }
+              }
+            ],
+            "name": "symptom"
+          }
+        ]
+      }
+    },
+    "version": "23"
+  }
+  
