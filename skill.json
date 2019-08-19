@@ -1,29 +1,55 @@
 {
   "manifest": {
-    "publishingInformation": {
-      "locales": {
-        "ja-JP": {
-          "summary": "栄養",
-          "examplePhrases": [
-            "アレクサ、栄養を開いて"
-          ],
-          "name": "healthcare",
-          "description": "栄養スキル"
-        }
-      },
-      "isAvailableWorldwide": true,
-      "testingInstructions": "Sample Testing Instructions.",
-      "category": "KNOWLEDGE_AND_TRIVIA",
-      "distributionCountries": []
-    },
     "apis": {
       "custom": {
         "endpoint": {
-          "sourceDir": "lambda/py/lambda_upload",
-          "uri": "ask-custom-healthcare-default"
-        }
+          "uri": "arn:aws:lambda:us-west-2:595973557631:function:otsukare-supplement-prod"
+        },
+        "interfaces": []
       }
     },
-    "manifestVersion": "1.0"
+    "manifestVersion": "1.0",
+    "privacyAndCompliance": {
+      "locales": {
+        "ja-JP": {}
+      },
+      "allowsPurchases": false,
+      "usesPersonalInfo": false,
+      "isChildDirected": false,
+      "isExportCompliant": true,
+      "containsAds": false
+    },
+    "publishingInformation": {
+      "locales": {
+        "ja-JP": {
+          "name": "お疲れサプリ",
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/18e7/e8abf8ddbac8453db9db6915321590da/APP_ICON?versionId=XhMu.RPDb9RiF12SB6wKLapV.26oaq_q&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20190819T110718Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAJFEYRBGIHK2BBYKA%2F20190819%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=011dec04262869ce910250f46fecb792035628a6c8a79368c6cc79f0c140f9fc",
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/743e/a5caf71aec15470dba15c3078c2037fa/APP_ICON_LARGE?versionId=P6y9wkDzIKEhU8uDepT_rohiyUgSCsUI&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20190819T110718Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAJFEYRBGIHK2BBYKA%2F20190819%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=dc13c211360ab0234dd35a07a57b7363bab6077742520e353ececfc2d24da181",
+          "summary": "あなたがお疲れの時、疲れの種類に合わせて栄養素・食べ物をおすすめするスキルです。倦怠感、食欲不振、目の疲れなどに効く食べ物をおすすめします。",
+          "description": "このスキルは、あなたの疲労状態に合わせて、おすすめの食べ物を提案します。倦怠感、食欲不振、集中力の低下、風邪気味、目や肩、頭の疲れといった状態に対応して、あなたの体に必要な栄養素を推測して、その栄養素をよく含む食べ物をお伝えします。\n\n■使い方\n\n起動は、\n「アレクサ、お疲れサプリを開いて」\nで行えます。\n\nあなたの今のお疲れ症状を言えば、おすすめの食べ物をおすすめします。\n\n＊例＊\nだるい、やる気が出ない、食欲がない、ぼーっとする、風邪っぽい、目の疲れ、肩こり、頭が疲れた　など\n\n■お疲れの分類\n\n1. 倦怠感：だるい、やる気が出ないとき・・・ビタミンB2\n2. 食欲不振：食欲が出ないとき・・・ビタミンB6\n3. 自律神経：集中が続かない、不眠、イライラ・・・カルシウム\n4. 代謝ダウン：疲れやすい、肌荒れ、冷え性など・・・パントテン酸\n5. 免疫力不足：風邪気味・・・ビタミンC\n6. 目や肩、頭の疲れ：ビタミンA、B1、B2、E、ナイアシン\n\n■ご注意\nこのスキルは、あなたのお疲れ原因を正確に分析するものではありません。また、おすすめされた食べ物を摂取したからといって、疲れが改善されることを保証するものではありません。",
+          "examplePhrases": [
+            "アレクサ、お疲れサプリを開いて",
+            "アレクサ、お疲れサプリで診断",
+            "目の疲れに効く食べ物を教えて"
+          ],
+          "keywords": [
+            "サプリ",
+            "おすすめ",
+            "栄養",
+            "ビタミン",
+            "食事",
+            "疲れ",
+            "疲労",
+            "回復"
+          ]
+        }
+      },
+      "isAvailableWorldwide": false,
+      "testingInstructions": "No additional requirements need to use this skill.\n\nテストの手順\n1. 「アレクサ、お疲れサプリを開いて」\nアレクサ側から、「診断と言ってください」と案内があるので、それに従う。\n2. 「診断」\nアレクサ側から、質問がやってくるので、はいかいいえで答える。\n3. 「はい」といった場合、アレクサがおすすめの食べ物を答える。\n4. 「いいえ」といった場合、更に質問がやってくるので、はいかいいえで答える。\n5. 「はい」といった場合、アレクサがおすすめの食べ物を答える。\n6. 「いいえ」といった場合、アレクサは具体的な疲れ状態を質問してくるので、「目の疲れ」と答える。\n7. アレクサがおすすめの食べ物を答える。「他には」と聞くと、他の食べ物を答える。",
+      "category": "HEALTH_AND_FITNESS",
+      "distributionCountries": [
+        "JP"
+      ]
+    }
   }
 }

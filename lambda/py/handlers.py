@@ -21,7 +21,12 @@ class HelpIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "You can say hello to me! How can I help?"
+        # 解答済みかどうかでヘルプの内容を変更する
+        session_atr = handler_input.attributes_manager.session_attributes
+
+        speak_output = "診断といっていただくか、具体的な疲れの症状を言ってみてください。例えば、やるきがでない、とか、ぼーっとするとかです。"
+        if 'answer_category' in session_atr.keys():
+            speak_output ="すでに診断がおわりました。オススメの食べ物を知りたい場合は、ほかには、と聞いてみてください。"
 
         return (
             handler_input.response_builder
@@ -79,6 +84,7 @@ class SessionEndedRequestHandler(AbstractRequestHandler):
     """
     セッションを終了する際に呼ばれるハンドラ
     クリーンアップする類の処理を行う
+    ex: ユーザーがなにも返してこない時
     """
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
@@ -88,9 +94,9 @@ class SessionEndedRequestHandler(AbstractRequestHandler):
         # type: (HandlerInput) -> Response
 
         # Any cleanup logic goes here.
-
-        return handler_input.response_builder.response
-
+        # return handler_input.response_builder.response
+        return CancelOrStopIntentHandler.handle(self, handler_input)
+        
 class FallbackIntentHandler(AbstractRequestHandler):
     """
     ユーザーの発話がどのインテントにも該当しない場合
@@ -102,8 +108,11 @@ class FallbackIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
+        session_atr = handler_input.attributes_manager.session_attributes
 
         speak_output = "その言葉にはお答えできませんが、疲れの種類を教えてもらえれば、オススメの食べ物を考えてみます。"
+        if 'answer_category' in session_atr.keys():
+            speak_output ="ほかには、と聞いてもらえれば、ほかのおすすめの食べ物を考えてみます。"
 
         return (
             handler_input.response_builder
