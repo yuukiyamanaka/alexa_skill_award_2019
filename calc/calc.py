@@ -44,6 +44,7 @@ def ranknize():
       
       previous = s[0]
   
+  pprint(ranking)
   return ranking
 
 if __name__ == "__main__":
