@@ -24,9 +24,9 @@ class HelpIntentHandler(AbstractRequestHandler):
         # 解答済みかどうかでヘルプの内容を変更する
         session_atr = handler_input.attributes_manager.session_attributes
 
-        speak_output = "診断といっていただくか、具体的な疲れの症状を言ってみてください。例えば、やるきがでない、とか、ぼーっとするとかです。"
-        if 'answer_category' in session_atr.keys():
-            speak_output ="すでに診断がおわりました。オススメの食べ物を知りたい場合は、ほかには、と聞いてみてください。"
+        speak_output = "食材の名前を一つ言ってみてください。その食材に足りないビタミンと、そのビタミンを多く含む食材を考えてみます。"
+        if 'answer_vitamin' in session_atr.keys():
+            speak_output ="すでに組み合わせを考えています。オススメの食べ物を知りたい場合は、ほかには、と聞いてみてください。"
 
         return (
             handler_input.response_builder
@@ -47,7 +47,7 @@ class CancelOrStopIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "ありがとうございました．お大事に!"
+        speak_output = "ありがとうございました。"
 
         return (
             handler_input.response_builder
@@ -110,9 +110,9 @@ class FallbackIntentHandler(AbstractRequestHandler):
         # type: (HandlerInput) -> Response
         session_atr = handler_input.attributes_manager.session_attributes
 
-        speak_output = "その言葉にはお答えできませんが、疲れの種類を教えてもらえれば、オススメの食べ物を考えてみます。"
-        if 'answer_category' in session_atr.keys():
-            speak_output ="ほかには、と聞いてもらえれば、ほかのおすすめの食べ物を考えてみます。"
+        speak_output = "その言葉にはお答えできませんが、食材を教えてもらえれば、オススメの食材の組み合わせを考えてみます。"
+        if 'answer_vitamin' in session_atr.keys():
+            speak_output ="ほかには、と聞いてもらえれば、ほかのおすすめの食材を考えてみます。"
 
         return (
             handler_input.response_builder
