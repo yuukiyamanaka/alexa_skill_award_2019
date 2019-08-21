@@ -25,7 +25,7 @@ class HelpIntentHandler(AbstractRequestHandler):
         session_atr = handler_input.attributes_manager.session_attributes
 
         speak_output = "食材の名前を一つ言ってみてください。その食材に足りないビタミンと、そのビタミンを多く含む食材を考えてみます。"
-        if 'answer_category' in session_atr.keys():
+        if 'answer_vitamin' in session_atr.keys():
             speak_output ="すでに組み合わせを考えています。オススメの食べ物を知りたい場合は、ほかには、と聞いてみてください。"
 
         return (
@@ -111,7 +111,7 @@ class FallbackIntentHandler(AbstractRequestHandler):
         session_atr = handler_input.attributes_manager.session_attributes
 
         speak_output = "その言葉にはお答えできませんが、食材を教えてもらえれば、オススメの食材の組み合わせを考えてみます。"
-        if 'answer_category' in session_atr.keys():
+        if 'answer_vitamin' in session_atr.keys():
             speak_output ="ほかには、と聞いてもらえれば、ほかのおすすめの食材を考えてみます。"
 
         return (

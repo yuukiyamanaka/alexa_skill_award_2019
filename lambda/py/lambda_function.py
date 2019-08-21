@@ -61,8 +61,9 @@ class AnsweringIntentHandler(AbstractRequestHandler):
         food = random.choice(ANSWER[vitamin])
         # 回答済みの答えもいれておく
         handler_input.attributes_manager.session_attributes['answered_foods'] = [food]
+        print("おすすめの食材は%s" % food)
 
-        speak_output = "%sを追加で摂取するとよいかもしれません。オススメの食材は%sです。ほかの候補が知りたいときは、ほかには、と聞いてください" % vitamin, food
+        speak_output = vitamin + "を追加で摂取するとよいかもしれません。オススメの食材は" + food + "です。ほかの候補が知りたいときは、ほかには、と聞いてください"
 
         return (
             handler_input.response_builder
