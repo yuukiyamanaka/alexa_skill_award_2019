@@ -16,7 +16,7 @@ from ask_sdk_model import Response
 from ask_sdk_model.slu.entityresolution.status_code import StatusCode
 
 from handlers import HelpIntentHandler, CancelOrStopIntentHandler, SessionEndedRequestHandler, IntentReflectorHandler, CatchAllExceptionHandler, FallbackIntentHandler
-from answers import ANSWER, VITAMIN
+from answers import ANSWER, VITAMIN, RANKING
 
 class AnsweringIntentHandler(AbstractRequestHandler):
     """
@@ -52,30 +52,17 @@ class AnsweringIntentHandler(AbstractRequestHandler):
         
         print("クエリの食べ物は%sです" % query_food_id)
 
-        """
-        vitamin = VITAMIN[query_food_id]
-        food = random.choice(ANSWER[query_food_id])
+        ranking = RANKING[str(query_food_id)]
+
+        vitamin = sorted(ranking.items(), key=lambda x: x[1])[-1][0]
+        handler_input.attributes_manager.session_attributes['answer_vitamin'] = vitamin
+        print("足りないビタミンは%s" % vitamin)
+
+        food = random.choice(ANSWER[vitamin])
         # 回答済みの答えもいれておく
         handler_input.attributes_manager.session_attributes['answered_foods'] = [food]
 
-        # Fの場合だけ特別
-        if query_food_id in ["F1", "F2", "F3"]:
-            f_vitamin = VITAMIN["F"]
-            f_food = random.choice(ANSWER["F"])
-            handler_input.attributes_manager.session_attributes['f_answered_foods'] = [f_food]
-
-            vitamin = vitamin + 'と' + f_vitamin
-            food = food + 'と' + f_food
-
-        speak_output = '%sを摂取するといいかもしれません。オススメの食べ物は%sです。ほかの候補が知りたいときは、ほかには、と聞いてください' % (vitamin, food)
-
-        # そのほかの場合
-        if query_food_id == 'G':
-            speak_output = 'ちょっとわかりませんが、' + speak_output
-        
-        """
-
-        speak_output = "%sに不足しているビタミンは%sです。オススメの食材は%sです。ほかの候補が知りたいときは、ほかには、と聞いてください" % query_food_name, 'ビタミン', '食材'
+        speak_output = "%sを追加で摂取するとよいかもしれません。オススメの食材は%sです。ほかの候補が知りたいときは、ほかには、と聞いてください" % vitamin, food
 
         return (
             handler_input.response_builder
@@ -97,12 +84,11 @@ class AdditionalIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input, answer=None):
         # type: (HandlerInput) -> Response
 
-        query_food_id = handler_input.attributes_manager.session_attributes['query_food_id']
-        
+        vitamin = handler_input.attributes_manager.session_attributes['answer_vitamin']
         answered_foods = handler_input.attributes_manager.session_attributes['answered_foods']
 
-        # query_food_id or answerd_foodがない時
-        if not query_food_id or not answered_foods:
+        # vitamin or answerd_foodがない時
+        if not vitamin or not answered_foods:
             speak_output = 'まだ組み合わせる食材を聞いていませんね。組み合わせたい食材を言ってもらえれば、おすすめの組み合わせを考えてみます。'
             return (
                 handler_input.response_builder
@@ -113,7 +99,7 @@ class AdditionalIntentHandler(AbstractRequestHandler):
 
         speak_output = 'すみません。ほかの候補がもうありません。'
 
-        answers = ANSWER[query_food_id]
+        answers = ANSWER[vitamin]
 
         if len(answered_foods) != len(answers):
             answer = random.choice(answers)
@@ -124,25 +110,6 @@ class AdditionalIntentHandler(AbstractRequestHandler):
                 i += 1
             
             handler_input.attributes_manager.session_attributes['answered_foods'].append(answer)
-
-            # Fの場合だけ特別
-            if query_food_id in ["F1", "F2", "F3"]:
-                f_answered_foods = handler_input.attributes_manager.session_attributes['f_answered_foods']
-                f_answers = ANSWER["F"]
-
-                f_answer = None
-                if len(f_answered_foods) != len(f_answers):
-                    f_answer = random.choice(f_answers)
-
-                    i = 0
-                    while (f_answer in f_answered_foods) and i < 20:
-                        f_answer = random.choice(f_answers)
-                        i += 1
-
-                    handler_input.attributes_manager.session_attributes['f_answered_foods'].append(f_answer)
-                
-                if f_answer:
-                    answer = answer + 'と' + f_answer
 
             speak_output = '%sはどうでしょう。さらに知りたいときは、ほかには、と聞いてください' % answer
 
