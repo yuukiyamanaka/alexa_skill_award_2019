@@ -24,10 +24,10 @@
       "locales": {
         "ja-JP": {
           "name": "バランスビタミン",
-          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/18e7/e8abf8ddbac8453db9db6915321590da/APP_ICON?versionId=XhMu.RPDb9RiF12SB6wKLapV.26oaq_q&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20190820T135048Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAJFEYRBGIHK2BBYKA%2F20190820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=1616b315ac8a10da0f493937d5fa38e5a4ec51b7452286f2d9fcc2a5264d67fa",
-          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/743e/a5caf71aec15470dba15c3078c2037fa/APP_ICON_LARGE?versionId=P6y9wkDzIKEhU8uDepT_rohiyUgSCsUI&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20190820T135048Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAJFEYRBGIHK2BBYKA%2F20190820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=a2bb4fe3f249240ca69b85325c3a068aae762c1a87a429658a5c120777ea13fc",
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/18e7/e8abf8ddbac8453db9db6915321590da/APP_ICON?versionId=XhMu.RPDb9RiF12SB6wKLapV.26oaq_q&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20190821T082336Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAJFEYRBGIHK2BBYKA%2F20190821%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=0ca37c74446ae34654f04110b6769a01601946199bb4ad3df49e3e89292ca956",
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/743e/a5caf71aec15470dba15c3078c2037fa/APP_ICON_LARGE?versionId=P6y9wkDzIKEhU8uDepT_rohiyUgSCsUI&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20190821T082336Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAJFEYRBGIHK2BBYKA%2F20190821%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=a08503f7142f34163f4d689ae84c98221163aa221b8e66b8a44f9ec799152939",
           "summary": "食材のビタミンバランスを考慮して、一緒に食べるとバランスが良い組み合わせになる食材を提案するスキルです。",
-          "description": "このスキルは、一緒に食べるとビタミン成分がバランスよく摂取できる食材を提案します。\n\n■使い方\n\n起動は、\n「アレクサ、バランスビタミンを開いて」\nで行えます。\n\n食材を言っていただければ、その食材に不足しているビタミンを考えて、そのビタミンをよく含む食材を提案します。\n\n＊例＊\n「キャベツと一緒に食べるといいものを教えて」\n「豚バラ肉はどう？」\n\n■対象のビタミン\n\n■対象食品\n\n■データ元\n\n食品のビタミン含有量などは、日本食品標準成分表2015年版（七訂）http://www.mext.go.jp/a_menu/syokuhinseibun/1365297.htm\nを参考にしています。\n\n■ご注意\nビタミン含有量は、食材の細かな種類や、調理方法などによっても変化します。また、このスキルでは、食材の食べ合わせ効果や、ビタミン以外の摂取量を考慮していません。あくまで参考情報としてお考えください。",
+          "description": "このスキルは、一緒に食べるとビタミン成分がバランスよく摂取できる食材を提案します。\n\n■使い方\n\n起動は、\n「アレクサ、バランスビタミンを開いて」\nで行えます。\n\n食材を言っていただければ、その食材に不足しているビタミンを考えて、そのビタミンをよく含む食材を提案します。\n\n＊例＊\n「キャベツと一緒に食べるといいものを教えて」\n「豚バラ肉はどう？」\n\n■対象のビタミン\nビタミンB1/B2/B6/B12/C/D/K、ナイアシン、葉酸、パントテン酸、ビオチン\n\n■対象食品\n芋類：じゃがいも、ながいも\n豆類：アーモンド、ピーナッツ、豆乳\n野菜類：トマト、ニンジン、きゃべつ、レタス、大根、枝豆、ピーマン、ねぎ、なす、たまねぎ、きゅうり、アスパラガス、ブロッコリー、かいわれ、ごぼう、にら、にんにく、ほうれんそう\n果物類：オレンジ、りんご、レモン、アボガド、すいか、ぶどう、バナナ\nきのこ類：しいたけ、しめじ、エリンギ、なめこ\nも類：わかめ、のり\n魚介類：いか、たら、まぐろ、ひらめ、たい、サーモン、はまち、さんま、いわし、さば、ほっけ、かつお、ぶり、あじ、うなぎ、しじみ、うに、あわび、すじこ\n肉類：豚肉、牛肉、鶏肉\nその他：たまご、牛乳、チーズ\n\n■データ元\n\n食品のビタミン含有量などは、日本食品標準成分表2015年版（七訂）http://www.mext.go.jp/a_menu/syokuhinseibun/1365297.htm\nを参考にしています。\n\n■ご注意\nビタミン含有量は、食材の細かな種類や、調理方法などによっても変化します。また、このスキルでは、食材の食べ合わせ効果や、ビタミン以外の摂取量を考慮していません。あくまで参考情報としてお考えください。\n\nこのスキルは医学的な助言を行うものではなく、あくまで情報や知識の提供のみを目的とするものであり、医師の助言、診療、または診断に代わるものではありません。医学的な助言を受けるには医師にご相談ください。救急医療が必要と判断された場合は、緊急通報用番号に電話し、救急車を呼んでください。",
           "examplePhrases": [
             "アレクサ、バランスビタミンを開いて",
             "アレクサ、バランスビタミンでキャベツはどう？",
@@ -45,7 +45,7 @@
         }
       },
       "isAvailableWorldwide": false,
-      "testingInstructions": "No additional requirements need to use this skill.\n\nテストの手順\n1. 「アレクサ、お疲れサプリを開いて」\nアレクサ側から、「診断と言ってください」と案内があるので、それに従う。\n2. 「診断」\nアレクサ側から、質問がやってくるので、はいかいいえで答える。\n3. 「はい」といった場合、アレクサがおすすめの食べ物を答える。\n4. 「いいえ」といった場合、更に質問がやってくるので、はいかいいえで答える。\n5. 「はい」といった場合、アレクサがおすすめの食べ物を答える。\n6. 「いいえ」といった場合、アレクサは具体的な疲れ状態を質問してくるので、「目の疲れ」と答える。\n7. アレクサがおすすめの食べ物を答える。「他には」と聞くと、他の食べ物を答える。",
+      "testingInstructions": "No additional requirements need to use this skill.\n\nテストの手順\n1. 「アレクサ、バランスビタミンを開いて」\nアレクサ側から、「食材名を言ってください」と案内があるので、それに従う。\n2. 「キャベツ」\nアレクサ側から、\n3. アレクサがおすすめの食べ物を答える。「ほかには」と聞くと、他の食べ物を答える。\n4. 別の食べ物を言うと、再び、アレクサがオススメの食べ物を答える。\n5. 「ほかには」を聞き続けると、どこかで「もう候補がありません」と答える。",
       "category": "HEALTH_AND_FITNESS",
       "distributionCountries": [
         "JP"
